@@ -61,7 +61,7 @@ public class AnswerNode extends Thread {
                     response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
                             "\"nextID\":" + previousID+ "\"}";
                 }
-                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),receivePacket.getPort());
+                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),8000);
                 socket.send(responsePacket);
                 break;
                 //sending port = 8000
