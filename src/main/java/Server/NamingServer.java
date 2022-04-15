@@ -15,7 +15,10 @@ public class NamingServer {
     Logger logger = LoggerFactory.getLogger(NamingServer.class);
     private static final TreeMap<Integer, String> ipMapping = new TreeMap<>();
     static ReadWriteLock ipMapLock = new ReentrantReadWriteLock(); //lock to avoid reading when someone else is writing and vice versa
+    Discovery discovery;
     public NamingServer() {
+        this.discovery = new Discovery();
+        this.discovery.start();
     }
 
     public static TreeMap<Integer, String> getIpMapping() {
