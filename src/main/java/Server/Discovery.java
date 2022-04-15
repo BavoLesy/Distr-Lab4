@@ -34,7 +34,7 @@ public class Discovery extends Thread {
                 String receivedData = new String(receivePacket.getData()).trim(); //this is the name of the Node!
                 int hash = ns.hash(receivedData);
                 String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
-                String response = "";
+                String response;
                 if (ns.addNode(receivedData, IP).equals("Added Node " + receivedData + " with hash: " + hash + "\n")){
                     //if adding is successful
                     NamingServer.ipMapLock.readLock().lock();
@@ -60,7 +60,7 @@ public class Discovery extends Thread {
             }
         }
     }
-    public void end(){
+    public void terminate(){
         this.running = false;
     }
 }

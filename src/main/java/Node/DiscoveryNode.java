@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.*;
 
 public class DiscoveryNode extends Thread {
-    boolean running = true;
     DatagramSocket socket;
 
     private final InetAddress broadcastAddress;
@@ -39,10 +38,8 @@ public class DiscoveryNode extends Thread {
         }
         //this.name = name;
         //this.node_IP = InetAddress.getLocalHost().getHostAddress();
-
         //this.namingServer_IP = "192.168.80.3";
     }
-
     //Network discovery (multicast)
     public void start() {
         boolean receivedServer = false;
@@ -67,30 +64,31 @@ public class DiscoveryNode extends Thread {
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 String sender = ((JSONObject) obj).get("sender").toString();
-                if (sender.equals("NamingServer")) {
-                    receivedServer = true;
+                switch (sender) {
+                    case "NamingServer":
+                        receivedServer = true;
                         this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
                         this.ID = (int) (long) ((JSONObject) obj).get("node ID");
                         this.amount = (int) (long) ((JSONObject) obj).get("node amount");
-                    if(status.equals("OK")) {
-                        this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
-                        this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
-                    }
-                }else if(sender.equals("NodeNext")) {
-                    //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
-                    //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
-                    nodecounter++;
-
-                }else if(sender.equals("NodePrevious")) {
-                    //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
-                    //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
-                    nodecounter++;
-
+                        if (status.equals("OK")) {
+                            this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
+                            this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
+                        }
+                        break;
+                    case "NodeNext":
+                        //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
+                        //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
+                        nodecounter++;
+                        break;
+                    case "NodePrevious":
+                        //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
+                        //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
+                        nodecounter++;
+                        break;
                 }
                 if(nodecounter == amount-1){
-                    receivedAllNodes = true;
+                    //receivedAllNodes = true;
                 }
-
 
             }
              catch (IOException | ParseException | InterruptedException e) {
@@ -107,60 +105,4 @@ public class DiscoveryNode extends Thread {
     }
 
 }
-/*
-            try { // If we receive
-                socket.receive(receivePacket); // So now timeout for 2s
-                received = true;
-                System.out.println("received packet from: " + receivePacket.getSocketAddress());
-                String data = new String(receivePacket.getData()).trim();
-                System.out.println("received data: " + data);
-                this.node_IP = InetAddress.getLocalHost().getHostAddress();
-                this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse(data);
-                String status = ((JSONObject)obj).get("node").toString();
-                if (status.equals("Added successfully")){
-                    this.hash =   (int) (long) ((JSONObject)obj).get("node hash");
-                    this.amount = (int) (long) ((JSONObject)obj).get("node amount");
-                    this.nodes  =  ((JSONObject)obj).get("nodes").toString();
-                }else if (status.equals("Error: Node was not added")){
-                    System.out.println("Error: Node was not added");
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-*/
 
-/*
-
-            try { // If we receive
-                socket.receive(receivePacket); // So now timeout for 2s
-                received = true;
-                System.out.println("received packet from: " + receivePacket.getSocketAddress());
-                String data = new String(receivePacket.getData()).trim();
-                System.out.println("received data: " + data);
-                this.node_IP = InetAddress.getLocalHost().getHostAddress();
-                this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
-
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse(data);
-                String status = ((JSONObject)obj).get("node").toString();
-
-                if (status.equals("Added successfully")){
-                    this.hash =   (int) (long) ((JSONObject)obj).get("node hash");
-                    this.amount = (int) (long) ((JSONObject)obj).get("node amount");
-                    this.nodes  =  ((JSONObject)obj).get("nodes").toString();
-                }else if (status.equals("Error: Node was not added")){
-                    System.out.println("Error: Node was not added");
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-*/

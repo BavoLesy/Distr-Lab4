@@ -31,8 +31,8 @@ public class NamingNode extends Thread{
         //start answer
         this.answerNode = new AnswerNode(name);
         this.answerNode.start();
-        //this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
-        this.namingServer_IP = "localhost";
+        this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
+        //this.namingServer_IP = "localhost";
     }
 
 

@@ -25,7 +25,7 @@ public class AnswerNode extends Thread {
         super(name);
         this.name = name;
         try{
-            this.socket = new DatagramSocket(8002); // receivingPort
+            this.socket = new DatagramSocket(8001); // receivingPort
             this.socket.setSoTimeout(1000);
         } catch (SocketException e) {
             this.socket = null;
@@ -61,7 +61,7 @@ public class AnswerNode extends Thread {
                     response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
                             "\"nextID\":" + previousID+ "\"}";
                 }
-                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
+                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),receivePacket.getPort());
                 socket.send(responsePacket);
                 break;
                 //sending port = 8000
