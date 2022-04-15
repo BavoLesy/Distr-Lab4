@@ -1,5 +1,6 @@
 package Node;
 
+import Server.Discovery;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.simple.JSONObject;
@@ -9,17 +10,31 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 import java.net.*;
 
-public class NamingNode{
+public class NamingNode extends Thread{
     private final String node_IP;
+    public String name;
     private final String namingServer_IP;
     private int hash;
+    private int previousID;
+    private int nextID;
     private int amount;
     private String nodes;
+    DiscoveryNode discoveryNode;
+    AnswerNode answerNode;
 
-    public NamingNode(String name) throws UnknownHostException { //constructor
+        //this.namingServer_IP = "192.168.80.3"; //if we do network discovery with broadcasting?
+    public NamingNode(String name) throws IOException { //constructor
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
-        this.namingServer_IP = "192.168.80.3"; //if we do network discovery with broadcasting?
+        //start discovery
+        this.discoveryNode = new DiscoveryNode(name);
+        this.discoveryNode.start();
+        //start answer
+        this.answerNode = new AnswerNode(name);
+        this.answerNode.start();
+        //this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
+        this.namingServer_IP = "localhost";
     }
+
 
     public void getFile(String filename) {
         try {
@@ -47,7 +62,6 @@ public class NamingNode{
         }
     }
     public void newNode(String user, String IP) throws UnirestException {
-
         //String URL = "http://localhost:8080/NamingServer/Nodes/" + user;
         String URL = "http://" + this.namingServer_IP + ":8080/NamingServer/Nodes/" + user;
         System.out.println(Unirest.post(URL).header("Content-Type", "application/json").body(IP).asString().getBody());
@@ -85,14 +99,19 @@ public class NamingNode{
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
-        String IP = InetAddress.getLocalHost().getHostAddress();
-        node.newNode(name, IP);
-        node.getNode(name);
-        node.printOut();
+
+        //String IP = InetAddress.getLocalHost().getHostAddress();
+
+
+
+        //node.newNode(name, IP);
+        //node.getNode(name);
+        //node.printOut();
+
         //test some files
-        node.getFile("testFile.txt");
-        node.getFile("testFile2.pdf");
-        node.getFile("testFile3.jpg");
+        //node.getFile("testFile.txt");
+        //node.getFile("testFile2.pdf");
+        //node.getFile("testFile3.jpg");
         //node.delete();
     }
 }

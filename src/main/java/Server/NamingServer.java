@@ -4,6 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -11,13 +16,16 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @RestController
-public class NamingServer {
+public class NamingServer extends Thread{
     Logger logger = LoggerFactory.getLogger(NamingServer.class);
     private static final TreeMap<Integer, String> ipMapping = new TreeMap<>();
     static ReadWriteLock ipMapLock = new ReentrantReadWriteLock(); //lock to avoid reading when someone else is writing and vice versa
+    //DiscoveryHandler discoveryHandler;
     Discovery discovery;
     public NamingServer() {
-        this.discovery = new Discovery();
+        //this.discoveryHandler = new DiscoveryHandler(this);
+        //discoveryHandler.start();
+        this.discovery = new Discovery(this);
         this.discovery.start();
     }
 
@@ -106,5 +114,77 @@ public class NamingServer {
             send = "{\"node status\":\"Node does not exist\"}";
         }
         return send;
+    }
+    //Automatic discovery of new nodes
+    private class DiscoveryHandler extends Thread{
+        NamingServer nameServer;
+        boolean running = false;
+        DatagramSocket socket;
+
+        private DiscoveryHandler(){}
+        public DiscoveryHandler(NamingServer nameServer) {
+            this.nameServer = nameServer;
+            try {
+                this.socket = new DatagramSocket(8001);
+                this.socket.setBroadcast(true);
+                this.socket.setSoTimeout(888);
+            } catch (SocketException e) {
+                this.socket = null;
+                System.out.println("Automatic node discovery disabled");
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            if (this.socket == null) return;
+
+            this.running = true;
+            byte[] receiveBuffer = new byte[512];
+            DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+            while (this.running) {
+                try {
+                    this.socket.receive(receivePacket);
+                    System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                    String data = new String(receivePacket.getData()).trim();
+
+                    int hash = this.nameServer.hash(data);
+                    String ip = receivePacket.getAddress().getHostAddress();
+                    String response;
+                    if (this.nameServer.addNode(data,ip).equals("Added Node " + data + " with hash: " + hash + "\n")){
+                        //adding successful
+                        ipMapLock.readLock().lock();
+                        Integer lowerId = getIpMapping().lowerKey(hash-1);
+                        if (lowerId == null) lowerId = getIpMapping().lastKey();
+                        Integer higherId = getIpMapping().higherKey(hash+1);
+                        if (higherId == null) higherId = getIpMapping().firstKey();
+
+                        response = "{\"status\":\"OK\"," +
+                                "\"id\":" + hash + "," +
+                                "\"nodeCount\":" + getIpMapping().size() + "," +
+                                "\"prevNodeId\":" + lowerId+ "," +
+                                "\"nextNodeId\":" + higherId + "}";
+                        this.nameServer.ipMapLock.readLock().unlock();
+                    }else{
+                        //adding unsuccessful
+                        this.nameServer.logger.info("Adding node failed");
+                        response = "{\"status\":\"Access Denied\"}";
+                    }
+                    DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
+                    this.socket.send(responsePacket);
+
+                } catch (IOException ignore) {}
+            }
+        }
+
+        public void terminate(){
+            this.running = false;
+        }
+    }
+
+
+    public void run(){
+        System.out.println("Starting NameServer...");
+        NamingServer nameServer = new NamingServer();
     }
 }
