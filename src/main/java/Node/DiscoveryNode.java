@@ -14,6 +14,7 @@ public class DiscoveryNode extends NamingNode {
     private int hash;
     private int amount;
     private String nodes;
+
     public DiscoveryNode(String name) throws UnknownHostException {
         super(name);
         this.name = name;
@@ -41,15 +42,19 @@ public class DiscoveryNode extends NamingNode {
                 System.out.println("received data: " + receivedData);
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
-                String sender = ((JSONObject)obj).get("sender").toString();
-                if(sender.equals("namingServer")){
+                String sender = ((JSONObject) obj).get("sender").toString();
+                if (sender.equals("namingServer")) {
                     this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
+
                 }
 
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
+        }
+    }
+}
+/*
 
             try { // If we receive
                 socket.receive(receivePacket); // So now timeout for 2s
@@ -78,3 +83,4 @@ public class DiscoveryNode extends NamingNode {
         }
     }
 }
+*/
