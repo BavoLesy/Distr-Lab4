@@ -1,11 +1,13 @@
 package Node;
 
+import Server.NamingServer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class DiscoveryNode extends NamingNode {
     private final String name;
@@ -47,12 +49,53 @@ public class DiscoveryNode extends NamingNode {
                     this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
 
                 }
+                else if(sender.equals("namingNode")){
+                    //
+                }
 
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public void Answer() throws SocketException {
+        DatagramSocket socket = new DatagramSocket(8000); // receiving port
+        boolean running = true;
+        if (socket == null) return;
+        byte[] receiveBuffer = new byte[512];
+        DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+        while (running) {
+            try {
+                socket.receive(receivePacket);
+                System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                String receivedData = new String(receivePacket.getData()).trim(); //this is the name of the Node!
+                int hash = NamingServer.hash(receivedData);
+                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
+                int currentID = NamingServer.hash(name);
+                int nextID = NamingServer.hash(nextID);
+                int previousID = NamingServer.hash(previousID);
+                String response = "{\"status\":\"nothing changed\"}";
+                if(currentID<hash && hash<nextID){
+                    nextID = hash;
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
+                            "\"nextID\":" + nextID+ "\"}";
+                } else if (previousID < hash && hash < currentID){
+                    previousID = hash;
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
+                            "\"nextID\":" + previousID+ "\"}";
+                }
+                
+                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
+                socket.send(responsePacket);
+                break;
+                //sending port = 8000
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 /*
 
@@ -82,5 +125,6 @@ public class DiscoveryNode extends NamingNode {
             }
         }
     }
+
 }
 */
