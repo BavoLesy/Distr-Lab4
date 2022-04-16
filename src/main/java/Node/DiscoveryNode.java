@@ -32,7 +32,7 @@ public class DiscoveryNode extends Thread {
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
-            this.answerSocket = new DatagramSocket(8002);
+            this.answerSocket = new DatagramSocket(8001);
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
             this.discoverySocket.setBroadcast(true);
@@ -54,7 +54,7 @@ public class DiscoveryNode extends Thread {
         byte[] receive = new byte[512];
         //send out our name on the broadcastaddress
         DatagramPacket sendPacket = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8001); //broadcast on port 8001
-        DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
+        //DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (!receivedAllNodes || !receivedServer) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
