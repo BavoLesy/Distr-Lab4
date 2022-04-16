@@ -108,20 +108,21 @@ public class DiscoveryNode extends Thread {
         while(true) {
             try {
                 Thread.sleep(1000);
-                System.out.println("still alive");
+                //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 if(receivePacket.getAddress() != InetAddress.getLocalHost()) {
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
-                    int hash = ToHash.hash(receivedData);
+                    int hash = ToHash.hash(receivedData); // 8646
                     String response;
-                    int currentID = ToHash.hash(name);
-                    if (currentID < hash && hash < nextID) {
+                    int currentID = ToHash.hash(name); //17154
+                    //prev = 17154
+                    if (currentID < hash && (hash < nextID || nextID == currentID)) {
                         nextID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
                                 "\"nextID\":" + nextID + "\"}";
-                    } else if (previousID < hash && hash < currentID) {
+                    } else if ((previousID < hash || previousID == currentID) && hash < currentID) { //
                         previousID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
                                 "\"nextID\":" + previousID + "\"}";
