@@ -73,8 +73,6 @@ public class DiscoveryNode extends Thread {
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 String sender = ((JSONObject) obj).get("sender").toString();
-                System.out.println(status);
-                System.out.println(sender);
                 switch (sender) {
                     case "NamingServer":
                         receivedServer = true;
@@ -88,8 +86,6 @@ public class DiscoveryNode extends Thread {
                         break;
                         //make sure we get answer from ALL nodes so use diff IPS
                     case "Node":
-                        System.out.println("testetesttetts");
-                        System.out.println(nodesList);
                         //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
                         //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
@@ -128,9 +124,9 @@ public class DiscoveryNode extends Thread {
                     //prev = 17154
                     //next = 17154
                     System.out.println("hash: " + hash);
-                    System.out.println("currentID" + currentID);
-                    System.out.println("nextID" + nextID);
-                    System.out.println("previousID" + previousID);
+                    System.out.println("currentID: " + currentID);
+                    System.out.println("nextID: " + nextID);
+                    System.out.println("previousID: " + previousID);
                     if (currentID < hash && (hash < nextID || nextID == currentID)){
                         nextID = hash;
                     } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
