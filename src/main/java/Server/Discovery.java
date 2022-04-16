@@ -37,6 +37,7 @@ public class Discovery extends Thread {
                 String response;
                 if (ns.addNode(receivedData, IP).equals("Added Node " + receivedData + " with hash: " + hash + "\n")){
                     //if adding is successful
+                    ns.logger.info(NamingServer.getIpMapping().toString());
                     NamingServer.ipMapLock.readLock().lock();
                     Integer previousID = NamingServer.getIpMapping().lowerKey(hash-1);
                     if (previousID == null) previousID = NamingServer.getIpMapping().lastKey();
