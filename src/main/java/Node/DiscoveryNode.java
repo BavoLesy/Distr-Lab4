@@ -121,8 +121,6 @@ public class DiscoveryNode extends Thread {
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String s1 = "host0.group3.6dist" + receivePacket.getAddress().toString();
                 String s2 = InetAddress.getLocalHost().toString();
-                System.out.println(s1);
-                System.out.println(s2);
                 if(!s1.equals(s2)) {
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
