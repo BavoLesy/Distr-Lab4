@@ -9,7 +9,8 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 
 public class DiscoveryNode extends Thread {
-    DatagramSocket socket;
+    DatagramSocket discoverySocket;
+    DatagramSocket answerSocket;
 
     private final InetAddress broadcastAddress;
     private int amount;
@@ -29,11 +30,12 @@ public class DiscoveryNode extends Thread {
         this.name = name;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
-            this.socket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
-            this.socket.setBroadcast(true);
-            this.socket.setSoTimeout(1000);
+            this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
+            this.answerSocket = new DatagramSocket(8001, InetAddress.getLocalHost());
+            this.discoverySocket.setBroadcast(true);
+            this.discoverySocket.setSoTimeout(1000);
         } catch (SocketException e) {
-            this.socket = null;
+            this.discoverySocket = null;
             System.out.println("Something went wrong");
             e.printStackTrace();
         }
@@ -54,10 +56,10 @@ public class DiscoveryNode extends Thread {
         while (!receivedAllNodes || !receivedServer) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
                 Thread.sleep(1000);
-                socket.send(sendPacket);
+                discoverySocket.send(sendPacket);
                 //socket.send(sendPacket2);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
-                socket.receive(receivePacket); // receive a packet on this socket
+                discoverySocket.receive(receivePacket); // receive a packet on this socket
                 System.out.println("received packet from: " + receivePacket.getSocketAddress());
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 System.out.println("received data: " + receivedData);
@@ -98,7 +100,7 @@ public class DiscoveryNode extends Thread {
         }
         while (receivedAllNodes && receivedServer){
             try{
-                socket.receive(receivePacket);
+                answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 int hash = ToHash.hash(receivedData);
@@ -115,7 +117,7 @@ public class DiscoveryNode extends Thread {
                             "\"nextID\":" + previousID+ "\"}";
                 }
                 DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),receivePacket.getPort());
-                socket.send(responsePacket);
+                answerSocket.send(responsePacket);
                 break;
                 //sending port = 8000
             } catch (IOException e) {
