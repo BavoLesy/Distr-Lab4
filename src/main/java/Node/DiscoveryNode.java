@@ -125,11 +125,12 @@ public class DiscoveryNode extends Thread {
                     String response;
                     int currentID = ToHash.hash(name); //17154
                     //prev = 17154
+                    //next = 17154
                     if (currentID < hash && (hash < nextID || nextID == currentID)) {
                         nextID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
                                 "\"nextID\":" + nextID + "\"}";
-                    } else if ((previousID < hash || previousID == currentID) && hash < currentID) { //
+                    } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
                         previousID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
                                 "\"previousID\":" + previousID + "\"}";
