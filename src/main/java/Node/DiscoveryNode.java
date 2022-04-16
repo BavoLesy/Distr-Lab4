@@ -51,7 +51,7 @@ public class DiscoveryNode extends Thread {
     }
     //Network discovery (multicast)
     public void start() {
-        List<SocketAddress> nodesList = new ArrayList<>();
+        List<String> nodesList = new ArrayList<>();
         boolean receivedServer = false;
         boolean receivedAllNodes = false;
         int nodecounter = 0;
@@ -90,10 +90,9 @@ public class DiscoveryNode extends Thread {
                         //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
                         //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
-                        if(!nodesList.contains(receivePacket.getSocketAddress())) {
+                        if(!nodesList.contains(receivePacket.getAddress().getHostAddress())) {
                             nodecounter++;
-
-                            nodesList.add(receivePacket.getSocketAddress());
+                            nodesList.add(receivePacket.getAddress().getHostAddress());
                         }
                         break;
                 }
@@ -129,14 +128,10 @@ public class DiscoveryNode extends Thread {
                     System.out.println("currentID" + currentID);
                     System.out.println("nextID" + nextID);
                     System.out.println("previousID" + previousID);
-                    if (currentID < hash) {
+                    if (currentID < hash && (hash < nextID || nextID == currentID)){
                         nextID = hash;
-                    } else if (hash < currentID && previousID < hash) { //
+                    } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
                         previousID = hash;
-                    } else if (hash < currentID && previousID == currentID) {
-                        previousID = hash;
-                    }else if(hash < nextID || nextID == currentID){
-                        nextID = hash;
                     }
                     response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
                             "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "\"}";
