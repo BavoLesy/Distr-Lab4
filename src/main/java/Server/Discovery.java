@@ -41,8 +41,10 @@ public class Discovery extends Thread {
                     NamingServer.ipMapLock.readLock().lock();
                     Integer previousID = NamingServer.getIpMapping().lowerKey(hash-1);
                     if (previousID == null) previousID = NamingServer.getIpMapping().lastKey();
+                    ns.logger.info(previousID.toString());
                     Integer nextID = NamingServer.getIpMapping().higherKey(hash+1);
                     if (nextID == null) nextID = NamingServer.getIpMapping().firstKey();
+                    ns.logger.info(nextID.toString());
                     response = "{\"status\":\"OK\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
                             "\"node amount\":" + NamingServer.getIpMapping().size() + ","
                             + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "}";
