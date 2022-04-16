@@ -118,6 +118,8 @@ public class DiscoveryNode extends Thread {
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                System.out.println(receivePacket.getAddress());
+                System.out.println(InetAddress.getLocalHost());
                 if(receivePacket.getAddress() != InetAddress.getLocalHost()) {
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
