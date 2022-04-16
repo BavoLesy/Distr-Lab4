@@ -73,6 +73,7 @@ public class DiscoveryNode extends Thread {
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 String sender = ((JSONObject) obj).get("sender").toString();
+                System.out.println(status);
                 System.out.println(sender);
                 switch (sender) {
                     case "NamingServer":
@@ -136,7 +137,7 @@ public class DiscoveryNode extends Thread {
                         previousID = hash;
                     }
                     response = "{\"status\":\"OK\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
-                            "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "\"}";
+                            "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.answerSocket.send(responsePacket);
                 }
