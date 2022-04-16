@@ -73,6 +73,7 @@ public class DiscoveryNode extends Thread {
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 String sender = ((JSONObject) obj).get("sender").toString();
+                System.out.println(sender);
                 switch (sender) {
                     case "NamingServer":
                         receivedServer = true;
