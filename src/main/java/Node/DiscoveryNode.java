@@ -8,6 +8,8 @@ import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiscoveryNode extends Thread {
     DatagramSocket discoverySocket;
@@ -48,6 +50,7 @@ public class DiscoveryNode extends Thread {
     }
     //Network discovery (multicast)
     public void start() {
+        List<SocketAddress> nodesList = new ArrayList<>();
         boolean receivedServer = false;
         boolean receivedAllNodes = false;
         int nodecounter = 0;
@@ -80,15 +83,16 @@ public class DiscoveryNode extends Thread {
                             this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
                         }
                         break;
+                        //make sure we get answer from ALL nodes so use diff IPS
                     case "NodeNext":
+                    case "NodePrevious":
+                        //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
                         //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
-                        nodecounter++;
-                        break;
-                    case "NodePrevious":
-                        //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
-                        //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
-                        nodecounter++;
+                        if(!nodesList.contains(receivePacket.getSocketAddress())) {
+                            nodesList.add(receivePacket.getSocketAddress());
+                            nodecounter++;
+                        }
                         break;
                 }
                 if(nodecounter == amount-1){
@@ -125,7 +129,7 @@ public class DiscoveryNode extends Thread {
                     } else if ((previousID < hash || previousID == currentID) && hash < currentID) { //
                         previousID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
-                                "\"nextID\":" + previousID + "\"}";
+                                "\"previousID\":" + previousID + "\"}";
                     } else {
                         response = "{\"status\":\"nothing changed\"," + "\"sender\":\"NodeNext\"}";
                     }
