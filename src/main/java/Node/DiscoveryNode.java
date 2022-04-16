@@ -85,8 +85,8 @@ public class DiscoveryNode extends Thread {
                         }
                         break;
                         //make sure we get answer from ALL nodes so use diff IPS
-                    case "NodeNext":
-                    case "NodePrevious":
+                    case "Node":
+                        System.out.println(nodesList);
                         //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
                         //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
@@ -133,7 +133,7 @@ public class DiscoveryNode extends Thread {
                     } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
                         previousID = hash;
                     }
-                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
                             "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "\"}";
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.answerSocket.send(responsePacket);
