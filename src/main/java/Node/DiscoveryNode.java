@@ -104,18 +104,15 @@ public class DiscoveryNode extends Thread {
                // e.printStackTrace();
             }
         }
-
         while(true) {
             try {
                 Thread.sleep(900);
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
-                System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String s1 = receivePacket.getAddress().toString();
                 String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
-                System.out.println(s1);
-                System.out.println(s2);
                 if(!s1.equals(s2)) {
+                    System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
                     int hash = ToHash.hash(receivedData); // 8646
@@ -123,17 +120,22 @@ public class DiscoveryNode extends Thread {
                     int currentID = ToHash.hash(name); //17154
                     //prev = 17154
                     //next = 17154
-                    System.out.println("hash: " + hash);
-                    System.out.println("currentID: " + currentID);
-                    System.out.println("nextID: " + nextID);
-                    System.out.println("previousID: " + previousID);
+                    //System.out.println("hash: " + hash);
+                    //System.out.println("currentID: " + currentID);
+                    //System.out.println("nextID: " + nextID);
+                    //System.out.println("previousID: " + previousID);
                     if (currentID < hash && (hash < nextID || nextID == currentID)){
                         nextID = hash;
+                        response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
                     } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
                         previousID = hash;
+                        response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                    }else {
+                        response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
                     }
-                    response = "{\"status\":\"OK\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
-                            "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.answerSocket.send(responsePacket);
                 }
