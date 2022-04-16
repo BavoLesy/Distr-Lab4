@@ -119,8 +119,8 @@ public class DiscoveryNode extends Thread {
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                String s1 = "host0.group3.6dist" + receivePacket.getAddress().toString();
-                String s2 = InetAddress.getLocalHost().toString();
+                String s1 = receivePacket.getAddress().toString();
+                String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
                 System.out.println(s1);
                 System.out.println(s2);
                 if(!s1.equals(s2)) {
@@ -135,15 +135,23 @@ public class DiscoveryNode extends Thread {
                     System.out.println("currentID" + currentID);
                     System.out.println("nextID" + nextID);
                     System.out.println("previousID" + previousID);
-                    if (currentID < hash && (hash < nextID || nextID == currentID)) {
+                    if (currentID < hash) {
                         nextID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
                                 "\"nextID\":" + nextID + "\"}";
-                    } else if ((hash < currentID && previousID < hash) || (hash < currentID && previousID == currentID)) { //
+                    } else if (hash < currentID && previousID < hash) { //
                         previousID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
                                 "\"previousID\":" + previousID + "\"}";
-                    } else {
+                    } else if (hash < currentID && previousID == currentID) {
+                        previousID = hash;
+                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
+                                "\"previousID\":" + previousID + "\"}";
+                    }else if(hash < nextID || nextID == currentID){
+                        nextID = hash;
+                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "\"}";
+                    }else{
                         response = "{\"status\":\"nothing changed\"," + "\"sender\":\"NodeNext\"}";
                     }
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
