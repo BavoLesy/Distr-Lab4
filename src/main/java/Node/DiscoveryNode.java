@@ -52,6 +52,7 @@ public class DiscoveryNode extends Thread {
     //Network discovery (multicast)
     public void start() {
         List<String> nodesList = new ArrayList<>();
+        List<String> nodesList2 = new ArrayList<>();
         boolean receivedServer = false;
         boolean receivedAllNodes = false;
         int nodecounter = 0;
@@ -111,15 +112,14 @@ public class DiscoveryNode extends Thread {
                 answerSocket.receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString();
                 String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
-                if(!s1.equals(s2)) {
+                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
+                if((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
+                    nodesList2.add(IP);
                     System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
-                    String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
-                    int hash = ToHash.hash(receivedData); // 8646
+                    int hash = ToHash.hash(receivedData);
                     String response;
-                    int currentID = ToHash.hash(name); //17154
-                    //prev = 17154
-                    //next = 17154
+                    int currentID = ToHash.hash(name);
                     //System.out.println("hash: " + hash);
                     //System.out.println("currentID: " + currentID);
                     //System.out.println("nextID: " + nextID);
