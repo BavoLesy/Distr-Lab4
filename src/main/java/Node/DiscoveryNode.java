@@ -86,6 +86,7 @@ public class DiscoveryNode extends Thread {
                         break;
                         //make sure we get answer from ALL nodes so use diff IPS
                     case "Node":
+                        System.out.println("testetesttetts");
                         System.out.println(nodesList);
                         //this.receivingPreviousID = (int) (long) ((JSONObject)obj).get("previousID");
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
