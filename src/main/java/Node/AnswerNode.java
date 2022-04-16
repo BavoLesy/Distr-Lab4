@@ -25,7 +25,7 @@ public class AnswerNode extends Thread {
         super(name);
         this.name = name;
         try{
-            this.socket = new DatagramSocket(8001); // receivingPort
+            this.socket = new DatagramSocket(8002); // receivingPort
             this.socket.setSoTimeout(1000);
         } catch (SocketException e) {
             this.socket = null;

@@ -6,6 +6,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class DiscoveryNode extends Thread {
     DatagramSocket socket;
@@ -87,7 +88,7 @@ public class DiscoveryNode extends Thread {
                         break;
                 }
                 if(nodecounter == amount-1){
-                    //receivedAllNodes = true;
+                    receivedAllNodes = true;
                 }
 
             }
@@ -95,6 +96,34 @@ public class DiscoveryNode extends Thread {
                // e.printStackTrace();
             }
         }
+        while (receivedAllNodes && receivedServer){
+            try{
+                socket.receive(receivePacket);
+                System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
+                int hash = ToHash.hash(receivedData);
+                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
+                int currentID = ToHash.hash(name);
+                String response = "{\"status\":\"nothing changed\"}";
+                if(currentID<hash && hash<nextID){
+                    nextID = hash;
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
+                            "\"nextID\":" + nextID+ "\"}";
+                } else if (previousID < hash && hash < currentID){
+                    previousID = hash;
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
+                            "\"nextID\":" + previousID+ "\"}";
+                }
+                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),receivePacket.getPort());
+                socket.send(responsePacket);
+                break;
+                //sending port = 8000
+            } catch (IOException e) {
+                //e.printStackTrace();
+            }
+        }
+
+
             done = true;
     }
     public String getAddress(){
