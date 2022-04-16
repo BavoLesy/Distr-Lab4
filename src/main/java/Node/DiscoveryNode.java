@@ -119,8 +119,8 @@ public class DiscoveryNode extends Thread {
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 System.out.println(receivePacket.getAddress());
-                System.out.println(InetAddress.getLocalHost());
-                if(receivePacket.getAddress() != InetAddress.getLocalHost()) {
+                System.out.println(InetAddress.getLocalHost().getHostAddress());
+                if(receivePacket.getAddress().toString() .equals(InetAddress.getLocalHost().getHostAddress())) {
                     String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
                     int hash = ToHash.hash(receivedData); // 8646
