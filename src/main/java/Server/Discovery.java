@@ -3,11 +3,8 @@ package Server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Discovery extends Thread {
     boolean running = true;
@@ -27,7 +24,7 @@ public class Discovery extends Thread {
     }
     @Override
     public void run() {
-        List<SocketAddress> nodesList = new ArrayList<>();
+
         if (this.socket == null) return;
         byte[] receiveBuffer = new byte[512];
         DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -35,42 +32,38 @@ public class Discovery extends Thread {
             try {
                 this.socket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+                String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 int hash = ns.hash(receivedData);
                 String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
                 String response;
-                if(!nodesList.contains(receivePacket.getSocketAddress())) {
-                    nodesList.add(receivePacket.getSocketAddress());
-                    if (ns.addNode(receivedData, IP).equals("Added Node " + receivedData + " with hash: " + hash + "\n")) {
-                        //if adding is successful
-                        NamingServer.ipMapLock.readLock().lock();
-                        ns.logger.info(NamingServer.getIpMapping().toString());
-                        Integer previousID = NamingServer.getIpMapping().lowerKey(hash);
-                        if (previousID == null) previousID = hash;
-                        ns.logger.info(previousID.toString());
-                        Integer nextID = NamingServer.getIpMapping().higherKey(hash);
-                        if (nextID == null) nextID = hash;
-                        ns.logger.info(nextID.toString());
-                        response = "{\"status\":\"OK\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
-                                "\"node amount\":" + NamingServer.getIpMapping().size() + ","
-                                + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "}";
-                        NamingServer.ipMapLock.readLock().unlock();
-                    } else {
-                        //adding unsuccessful
-                        ns.logger.info("Adding node failed");
-                        response = "{\"status\":\"Node already exists\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
-                                "\"node amount\":" + NamingServer.getIpMapping().size() + "}";
-                    }
-                    DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
-                    this.socket.send(responsePacket);
-                    //sending port = 8000
+                if (ns.addNode(receivedData, IP).equals("Added Node " + receivedData + " with hash: " + hash + "\n")){
+                    //if adding is successful
+                    NamingServer.ipMapLock.readLock().lock();
+                    ns.logger.info(NamingServer.getIpMapping().toString());
+                    Integer previousID = NamingServer.getIpMapping().lowerKey(hash);
+                    if (previousID == null) previousID = hash;
+                    ns.logger.info(previousID.toString());
+                    Integer nextID = NamingServer.getIpMapping().higherKey(hash);
+                    if (nextID == null) nextID = hash;
+                    ns.logger.info(nextID.toString());
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
+                            "\"node amount\":" + NamingServer.getIpMapping().size() + ","
+                            + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "}";
+                    NamingServer.ipMapLock.readLock().unlock();
+                }else{
+                    //adding unsuccessful
+                    ns.logger.info("Adding node failed");
+                    response = "{\"status\":\"Node already exists\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
+                            "\"node amount\":" + NamingServer.getIpMapping().size() + "}";
                 }
-                } catch(IOException e){
-                    //e.printStackTrace();
-                }
+                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
+                this.socket.send(responsePacket);
+                //sending port = 8000
+                } catch (IOException e) {
+                //e.printStackTrace();
             }
         }
-
+    }
     public void terminate(){
         this.running = false;
     }

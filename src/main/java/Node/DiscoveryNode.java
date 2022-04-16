@@ -111,7 +111,7 @@ public class DiscoveryNode extends Thread {
 
         while(true) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(900);
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
@@ -133,13 +133,10 @@ public class DiscoveryNode extends Thread {
                     System.out.println("previousID" + previousID);
                     if (currentID < hash) {
                         nextID = hash;
-
                     } else if (hash < currentID && previousID < hash) { //
                         previousID = hash;
-
                     } else if (hash < currentID && previousID == currentID) {
                         previousID = hash;
-
                     }else if(hash < nextID || nextID == currentID){
                         nextID = hash;
                     }
