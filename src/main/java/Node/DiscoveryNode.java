@@ -126,6 +126,8 @@ public class DiscoveryNode extends Thread {
                     int currentID = ToHash.hash(name); //17154
                     //prev = 17154
                     //next = 17154
+                    System.out.println(nextID);
+                    System.out.println(previousID);
                     if (currentID < hash && (hash < nextID || nextID == currentID)) {
                         nextID = hash;
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
