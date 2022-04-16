@@ -133,23 +133,18 @@ public class DiscoveryNode extends Thread {
                     System.out.println("previousID" + previousID);
                     if (currentID < hash) {
                         nextID = hash;
-                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
-                                "\"nextID\":" + nextID + "\"}";
+
                     } else if (hash < currentID && previousID < hash) { //
                         previousID = hash;
-                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
-                                "\"previousID\":" + previousID + "\"}";
+
                     } else if (hash < currentID && previousID == currentID) {
                         previousID = hash;
-                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
-                                "\"previousID\":" + previousID + "\"}";
+
                     }else if(hash < nextID || nextID == currentID){
                         nextID = hash;
-                        response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
-                                "\"nextID\":" + nextID + "\"}";
-                    }else{
-                        response = "{\"status\":\"nothing changed\"," + "\"sender\":\"NodeNext\"}";
                     }
+                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
+                            "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "\"}";
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.answerSocket.send(responsePacket);
                 }
