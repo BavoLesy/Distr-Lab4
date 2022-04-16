@@ -108,11 +108,7 @@ public class DiscoveryNode extends Thread {
                // e.printStackTrace();
             }
         }
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         while(true) {
             try {
                 Thread.sleep(1000);
@@ -161,7 +157,6 @@ public class DiscoveryNode extends Thread {
                 //e.printStackTrace();
             }
         }
-
     }
     public String getAddress(){
         if(done) {
