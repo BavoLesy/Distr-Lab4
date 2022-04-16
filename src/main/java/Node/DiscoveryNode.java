@@ -99,7 +99,9 @@ public class DiscoveryNode extends Thread {
             }
         }
         while (receivedAllNodes && receivedServer){
+            System.out.println("still alive");
             try{
+                Thread.sleep(1000);
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
@@ -120,7 +122,7 @@ public class DiscoveryNode extends Thread {
                 answerSocket.send(responsePacket);
                 break;
                 //sending port = 8000
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 //e.printStackTrace();
             }
         }
