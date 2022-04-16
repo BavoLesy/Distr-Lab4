@@ -15,7 +15,7 @@ public class Discovery extends Thread {
         try{
             this.socket = new DatagramSocket(8001); // receivingPort
             this.socket.setBroadcast(true);
-            this.socket.setSoTimeout(900);
+            this.socket.setSoTimeout(1100);
         } catch (SocketException e) {
             this.socket = null;
             System.out.println("Something went wrong");
@@ -31,7 +31,7 @@ public class Discovery extends Thread {
             try {
                 this.socket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                String receivedData = new String(receivePacket.getData()).trim(); //this is the name of the Node!
+                String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 int hash = ns.hash(receivedData);
                 String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
                 String response;

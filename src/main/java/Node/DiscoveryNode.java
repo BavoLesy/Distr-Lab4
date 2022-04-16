@@ -29,7 +29,7 @@ public class DiscoveryNode extends Thread {
         this.name = name;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
-            this.socket = new DatagramSocket(8000); // receivingPort
+            this.socket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
             this.socket.setBroadcast(true);
             this.socket.setSoTimeout(1000);
         } catch (SocketException e) {
@@ -49,13 +49,13 @@ public class DiscoveryNode extends Thread {
         byte[] receive = new byte[512];
         //send out our name on the broadcastaddress
         DatagramPacket sendPacket = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8001); //broadcast on port 8001
-        DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
+        //DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (!receivedAllNodes || !receivedServer) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
                 Thread.sleep(1000);
                 socket.send(sendPacket);
-                socket.send(sendPacket2);
+                //socket.send(sendPacket2);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 socket.receive(receivePacket); // receive a packet on this socket
                 System.out.println("received packet from: " + receivePacket.getSocketAddress());
