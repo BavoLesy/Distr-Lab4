@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DiscoveryNode extends Thread {
@@ -119,7 +120,7 @@ public class DiscoveryNode extends Thread {
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String s1 = "host0.group3.6dist" + receivePacket.getAddress().toString();
-                String s2 = InetAddress.getLocalHost().getHostAddress();
+                String s2 = Arrays.toString(InetAddress.getLocalHost().getAddress());
                 System.out.println(s1);
                 System.out.println(s2);
                 if(!s1.equals(s2)) {
