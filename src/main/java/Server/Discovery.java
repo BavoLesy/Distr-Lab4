@@ -24,7 +24,6 @@ public class Discovery extends Thread {
     }
     @Override
     public void run() {
-
         if (this.socket == null) return;
         byte[] receiveBuffer = new byte[512];
         DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);

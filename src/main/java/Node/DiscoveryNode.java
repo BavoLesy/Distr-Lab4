@@ -66,16 +66,15 @@ public class DiscoveryNode extends Thread {
                 discoverySocket.send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 discoverySocket.receive(receivePacket); // receive a packet on this socket
-
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
+                System.out.println("received packet from: " + receivePacket.getSocketAddress());
+                System.out.println("received data: " + receivedData);
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 String sender = ((JSONObject) obj).get("sender").toString();
                 switch (sender) {
                     case "NamingServer":
-                        System.out.println("received packet from: " + receivePacket.getSocketAddress());
-                        System.out.println("received data: " + receivedData);
                         receivedServer = true;
                         this.namingServer_IP = String.valueOf(receivePacket.getAddress().getHostAddress());
                         this.ID = (int) (long) ((JSONObject) obj).get("node ID");
@@ -92,10 +91,9 @@ public class DiscoveryNode extends Thread {
                         //this.receivingID = (int) (long) ((JSONObject)obj).get("currentID");
                         //this.receivingNextID = (int) (long) ((JSONObject)obj).get("nextID");
                         if(!nodesList.contains(receivePacket.getSocketAddress())) {
-                            nodesList.add(receivePacket.getSocketAddress());
                             nodecounter++;
-                            System.out.println("received packet from: " + receivePacket.getSocketAddress());
-                            System.out.println("received data: " + receivedData);
+
+                            nodesList.add(receivePacket.getSocketAddress());
                         }
                         break;
                 }
