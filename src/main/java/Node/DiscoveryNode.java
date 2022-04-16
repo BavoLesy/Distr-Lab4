@@ -32,6 +32,7 @@ public class DiscoveryNode extends Thread {
         try{
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
             this.answerSocket = new DatagramSocket(8001, InetAddress.getLocalHost());
+            this.answerSocket.setBroadcast(true);
             this.discoverySocket.setBroadcast(true);
             this.discoverySocket.setSoTimeout(1000);
         } catch (SocketException e) {
@@ -99,8 +100,8 @@ public class DiscoveryNode extends Thread {
             }
         }
         while (receivedAllNodes && receivedServer){
-            System.out.println("still alive");
             try{
+                System.out.println("still alive");
                 Thread.sleep(1000);
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
