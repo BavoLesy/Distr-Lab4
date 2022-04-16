@@ -120,7 +120,7 @@ public class DiscoveryNode extends Thread {
                 answerSocket.receive(receivePacket);
                 System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String s1 = "host0.group3.6dist" + receivePacket.getAddress().toString();
-                String s2 = Arrays.toString(InetAddress.getLocalHost().getAddress());
+                String s2 = InetAddress.getLocalHost().toString();
                 System.out.println(s1);
                 System.out.println(s2);
                 if(!s1.equals(s2)) {
