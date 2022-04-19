@@ -27,8 +27,8 @@ public class AnswerNode extends Thread {
         super(name);
         this.name = name;
         try{
-            this.answerSocket.setBroadcast(true);
             this.answerSocket = new DatagramSocket(8001);
+            this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
         } catch (SocketException e) {
             this.answerSocket = null;
