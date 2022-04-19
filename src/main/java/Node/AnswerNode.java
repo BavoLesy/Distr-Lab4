@@ -40,7 +40,6 @@ public class AnswerNode extends Thread {
 
         //this.namingServer_IP = "192.168.80.3";
     }
-
     public void start() {
         List<String> nodesList2 = new ArrayList<>();
         if (answerSocket == null) return;
