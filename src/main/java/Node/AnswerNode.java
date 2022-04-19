@@ -6,10 +6,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnswerNode extends Thread {
     boolean running = true;
-    DatagramSocket socket;
+    DatagramSocket answerSocket;
     private int amount;
     private String node_IP;
     private String namingServer_IP;
@@ -25,10 +27,11 @@ public class AnswerNode extends Thread {
         super(name);
         this.name = name;
         try{
-            this.socket = new DatagramSocket(8002); // receivingPort
-            this.socket.setSoTimeout(1000);
+            this.answerSocket.setBroadcast(true);
+            this.answerSocket = new DatagramSocket(8001);
+            this.answerSocket.setSoTimeout(1000);
         } catch (SocketException e) {
-            this.socket = null;
+            this.answerSocket = null;
             System.out.println("Something went wrong");
             e.printStackTrace();
         }
@@ -39,34 +42,46 @@ public class AnswerNode extends Thread {
     }
 
     public void start() {
-        boolean running = true;
-        if (socket == null) return;
+        List<String> nodesList2 = new ArrayList<>();
+        if (answerSocket == null) return;
         byte[] receiveBuffer = new byte[512];
         DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-        while (running) {
+        while(true) {
             try {
-                socket.receive(receivePacket);
-                System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                String receivedData = new String(receivePacket.getData()).trim(); //this is the name of the Node!
-                int hash = ToHash.hash(receivedData);
-                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
-                int currentID = ToHash.hash(name);
-                String response = "{\"status\":\"nothing changed\"}";
-                if(currentID<hash && hash<nextID){
-                    nextID = hash;
-                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodeNext\"," + "\"currentID\":" + currentID + "," +
-                            "\"nextID\":" + nextID+ "\"}";
-                } else if (previousID < hash && hash < currentID){
-                    previousID = hash;
-                    response = "{\"status\":\"OK\"," + "\"sender\":\"NodePrevious\"," + "\"currentID\":" + currentID + "," +
-                            "\"nextID\":" + previousID+ "\"}";
+                Thread.sleep(900);
+                //System.out.println("still alive");
+                answerSocket.receive(receivePacket);
+                String s1 = receivePacket.getAddress().toString();
+                String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
+                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
+                if((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
+                    nodesList2.add(IP);
+                    System.out.println("Discovery package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                    String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+                    int hash = ToHash.hash(receivedData);
+                    String response;
+                    int currentID = ToHash.hash(name);
+                    //System.out.println("hash: " + hash);
+                    //System.out.println("currentID: " + currentID);
+                    //System.out.println("nextID: " + nextID);
+                    //System.out.println("previousID: " + previousID);
+                    if (currentID < hash && (hash < nextID || nextID == currentID)){
+                        nextID = hash;
+                        response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                    } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
+                        previousID = hash;
+                        response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                    }else {
+                        response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
+                                "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                    }
+                    DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
+                    this.answerSocket.send(responsePacket);
                 }
-                DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(),8000);
-                socket.send(responsePacket);
-                break;
-                //sending port = 8000
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
+                //e.printStackTrace();
             }
         }
     }
