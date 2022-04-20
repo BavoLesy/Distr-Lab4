@@ -74,7 +74,7 @@ public class DiscoveryNode extends Thread {
         int nodecounter = 0;
         byte[] receive = new byte[512];
         //send out our name on the broadcastaddress
-        String send = "{\"status\":\"Discovery\"," + "\"name\":" + name + "}";
+        String send = "{\"status\":\"Discovery\"," + "\"name\":" +"\"" + name + "\"" + "}";
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), broadcastAddress, 8001); //broadcast on port 8001
         //DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
