@@ -28,11 +28,11 @@ public class DiscoveryNode extends Thread {
     }
 
     public String getCurrentIP() {
-        return currentIP;
+        return this.currentIP;
     }
 
     public String getPreviousIP() {
-        return previousIP;
+        return this.previousIP;
     }
 
     public String getNextIP() {
@@ -56,6 +56,7 @@ public class DiscoveryNode extends Thread {
             this.answerSocket.setSoTimeout(1000);
             this.discoverySocket.setBroadcast(true);
             this.discoverySocket.setSoTimeout(1000);
+            this.currentIP = InetAddress.getLocalHost().getHostAddress();
         } catch (SocketException e) {
             this.discoverySocket = null;
             System.out.println("Something went wrong");
@@ -102,6 +103,7 @@ public class DiscoveryNode extends Thread {
                             this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
                             this.previousIP = (String) ((JSONObject) obj).get("previousIP");
                             this.nextIP = (String) ((JSONObject) obj).get("nextIP");
+
                          }
                         break;
                     //make sure we get answer from ALL nodes so use diff IPS
@@ -140,14 +142,14 @@ public class DiscoveryNode extends Thread {
                 if(status.equals("Discovery")) {
                     if ((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
                         nodesList2.add(IP);
-                        int hash = ToHash.hash(name);
                         String response;
                         String name = ((JSONObject) obj).get("name").toString();
-                        //System.out.println("hash: " + hash);
-                        //System.out.println("currentID: " + currentID);
-                        //System.out.println("nextID: " + nextID);
-                        //System.out.println("previousID: " + previousID);
-                        if (currentID < hash && (hash < this.nextID || this.nextID == currentID)) {
+                        int hash = ToHash.hash(name);
+                        System.out.println("hash: " + hash);
+                        System.out.println("currentID: " + currentID);
+                        System.out.println("nextID: " + this.nextID);
+                        System.out.println("previousID: " + this.previousID);
+                        if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
                             this.nextID = hash;
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
