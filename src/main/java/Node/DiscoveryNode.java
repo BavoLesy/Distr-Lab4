@@ -147,17 +147,17 @@ public class DiscoveryNode extends Thread {
                         //System.out.println("currentID: " + currentID);
                         //System.out.println("nextID: " + nextID);
                         //System.out.println("previousID: " + previousID);
-                        if (currentID < hash && (hash < nextID || nextID == currentID)) {
-                            nextID = hash;
-                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
-                                    "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
-                        } else if (hash < currentID && (previousID < hash || previousID == currentID)) { //
-                            previousID = hash;
-                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
-                                    "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                        if (currentID < hash && (hash < this.nextID || this.nextID == currentID)) {
+                            this.nextID = hash;
+                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
+                        } else if (hash < this.currentID && (this.previousID < hash || this.previousID == this.currentID)) { //
+                            this.previousID = hash;
+                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         } else {
-                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + currentID + "," +
-                                    "\"nextID\":" + nextID + "," + "\"previousID\":" + previousID + "}";
+                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         }
                         DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                         this.answerSocket.send(responsePacket);
