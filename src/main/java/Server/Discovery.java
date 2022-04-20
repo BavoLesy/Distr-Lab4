@@ -39,6 +39,7 @@ public class Discovery extends Thread {
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
+                System.out.println(status);
                 String name = ((JSONObject) obj).get("name").toString();
                 int hash = ns.hash(name);
                 if(status.equals("Discovery")) {
