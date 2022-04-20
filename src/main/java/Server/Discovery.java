@@ -36,10 +36,11 @@ public class Discovery extends Thread {
                 this.socket.receive(receivePacket);
                 System.out.println("package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
+                System.out.println("received data: " + receivedData);
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
-                System.out.println(status);
+                ns.logger.info(status);
                 String name = ((JSONObject) obj).get("name").toString();
                 int hash = ns.hash(name);
                 if(status.equals("Discovery")) {

@@ -100,8 +100,8 @@ public class NamingNode {
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
-        Thread.sleep(30);
-        ShutdownNode shutdownNode = new ShutdownNode(node);
+        //Thread.sleep(30);
+        //ShutdownNode shutdownNode = new ShutdownNode(node);
 
 
         //String IP = InetAddress.getLocalHost().getHostAddress();
