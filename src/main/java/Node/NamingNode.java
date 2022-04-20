@@ -11,16 +11,18 @@ import java.io.IOException;
 import java.net.*;
 
 public class NamingNode {
+    private static int nextID;
     private final String node_IP;
     public String name;
     private final String namingServer_IP;
     private int hash;
-    private int previousID;
-    private int nextID;
+    private static int previousID;
+
     private int amount;
     private String nodes;
     DiscoveryNode discoveryNode;
-    AnswerNode answerNode;
+
+    //AnswerNode answerNode;
 
         //this.namingServer_IP = "192.168.80.3"; //if we do network discovery with broadcasting?
     public NamingNode(String name) throws IOException { //constructor
@@ -33,13 +35,12 @@ public class NamingNode {
         //this.answerNode.start();
         this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
         //this.namingServer_IP = "localhost";
+
     }
-
-
     public void getFile(String filename) {
         try {
             //String URL = "http://localhost:8080/NamingServer/getFile/" + filename; //REST command
-            String URL = "http://" + this.namingServer_IP + ":8080/NamingServer/Files/" + filename;
+            String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Files/" + filename;
             System.out.println(Unirest.get(URL).asString().getBody());
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,7 +48,7 @@ public class NamingNode {
     }
     public void getNode(String user) throws UnirestException, ParseException {
         //String URL = "http://localhost:8080/NamingServer/Nodes/" + user;
-        String URL = "http://" + this.namingServer_IP + ":8080/NamingServer/Nodes/" + user;
+        String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + user;
         String data = Unirest.get(URL).asString().getBody();
         JSONParser parser = new JSONParser();
         Object obj = parser.parse(data);
@@ -63,13 +64,13 @@ public class NamingNode {
     }
     public void newNode(String user, String IP) throws UnirestException {
         //String URL = "http://localhost:8080/NamingServer/Nodes/" + user;
-        String URL = "http://" + this.namingServer_IP + ":8080/NamingServer/Nodes/" + user;
+        String URL = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + user;
         System.out.println(Unirest.post(URL).header("Content-Type", "application/json").body(IP).asString().getBody());
 
     }
     public void delete(String user){
         try {
-            String url = "http://" + this.namingServer_IP + ":8080/NamingServer/Nodes/" + user;
+            String url = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + user;
             System.out.println(Unirest.delete(url).asString().getBody());
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,7 +86,7 @@ public class NamingNode {
         System.out.println("node hostname + IP : " + InetAddress.getLocalHost());
     }
 
-    public static void main(String[] args) throws IOException, UnirestException, ParseException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Starting Node...");
         //turn off most of the logging
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("org.apache.http");
@@ -99,6 +100,9 @@ public class NamingNode {
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
+        Thread.sleep(30);
+        ShutdownNode shutdownNode = new ShutdownNode(node);
+
 
         //String IP = InetAddress.getLocalHost().getHostAddress();
 
