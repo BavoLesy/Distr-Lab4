@@ -146,7 +146,7 @@ public class DiscoveryNode extends Thread {
                         String name = ((JSONObject) obj).get("name").toString();
                         int hash = ToHash.hash(name);
                         System.out.println("hash: " + hash);
-                        System.out.println("currentID: " + currentID);
+                        System.out.println("currentID: " + this.currentID);
                         System.out.println("nextID: " + this.nextID);
                         System.out.println("previousID: " + this.previousID);
                         if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
