@@ -59,8 +59,8 @@ public class Discovery extends Thread {
                         String nextIP = NamingServer.getIpMapping().get(nextID);
                         response = "{\"status\":\"OK\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
                                 "\"node amount\":" + NamingServer.getIpMapping().size() + ","
-                                + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "," + "\"previousIP\":" +
-                                previousIP + "," + "\"nextIP\":" + nextIP + "}";
+                                + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "," + "\"previousIP\":" + "\"" +
+                                previousIP + "\"" +  "," + "\"nextIP\":" + "\"" + nextIP + "\"" + "}";
                         NamingServer.ipMapLock.readLock().unlock();
                     } else {
                         //adding unsuccessful
