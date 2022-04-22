@@ -36,6 +36,7 @@ public class NamingNode {
         this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
         //this.namingServer_IP = "localhost";
 
+
     }
     public void getFile(String filename) {
         try {
@@ -100,7 +101,6 @@ public class NamingNode {
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
-        Thread.sleep(15000);
         ShutdownNode shutdownNode = new ShutdownNode(node);
 
 
