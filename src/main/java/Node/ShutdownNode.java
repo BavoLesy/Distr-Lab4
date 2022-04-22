@@ -16,6 +16,7 @@ public class ShutdownNode extends Thread{
 
     public ShutdownNode(NamingNode node) throws SocketException {
         this.name = node.discoveryNode.getNodeName();
+        System.out.println(this.name);
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
         this.previousID = node.discoveryNode.getPreviousID();

@@ -100,7 +100,7 @@ public class NamingNode {
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
-        Thread.sleep(15);
+        Thread.sleep(15000);
         ShutdownNode shutdownNode = new ShutdownNode(node);
 
 
