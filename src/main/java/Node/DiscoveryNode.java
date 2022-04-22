@@ -130,10 +130,9 @@ public class DiscoveryNode extends Thread {
                 // e.printStackTrace();
             }
         }
-        while(running) {
+        while(!ShutdownNode.getRunning()) {
             try {
                 Thread.sleep(900);
-                this.running = ShutdownNode.getRunning();
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString();
