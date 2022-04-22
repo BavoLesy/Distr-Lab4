@@ -15,9 +15,7 @@ public class ShutdownNode extends Thread{
 
 
     public ShutdownNode(NamingNode node) throws SocketException, InterruptedException {
-        Thread.sleep(15000);
-        this.name = node.discoveryNode.getNodeName();
-        System.out.println(this.name);
+        this.name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
         this.previousID = node.discoveryNode.getPreviousID();
@@ -27,7 +25,7 @@ public class ShutdownNode extends Thread{
         node.delete(name);
     }
 
-    public void start(){
+    public void run(){
         try {
             System.out.println("Shutting down...");
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets

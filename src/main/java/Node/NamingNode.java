@@ -9,6 +9,8 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NamingNode {
     private static int nextID;
@@ -22,19 +24,30 @@ public class NamingNode {
     private String nodes;
     DiscoveryNode discoveryNode;
 
-    //AnswerNode answerNode;
 
         //this.namingServer_IP = "192.168.80.3"; //if we do network discovery with broadcasting?
     public NamingNode(String name) throws IOException { //constructor
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
+        this.name = name;
         //start discovery
         this.discoveryNode = new DiscoveryNode(name);
         this.discoveryNode.start();
+
         //start answer
         //this.answerNode = new AnswerNode(name);
         //this.answerNode.start();
         this.namingServer_IP = "192.168.80.3"; //DiscoveryNode.getAddress();
         //this.namingServer_IP = "localhost";
+        /*
+        this.currentID = discoveryNode.getCurrentID();
+        this.nextID = discoveryNode.getNextID();
+        this.previousID = discoveryNode.getPreviousID();
+        this.nextIP = discoveryNode.getNextIP();
+        this.previousIP = discoveryNode.getPreviousIP();
+        this.shutdownSocket = new DatagramSocket(8002);
+
+         */
+
 
 
     }
@@ -87,6 +100,7 @@ public class NamingNode {
         System.out.println("node hostname + IP : " + InetAddress.getLocalHost());
     }
 
+
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Starting Node...");
         //turn off most of the logging
@@ -101,9 +115,9 @@ public class NamingNode {
         }
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
-        ShutdownNode shutdownNode = new ShutdownNode(node);
-
-
+        //new DiscoveryNode(name).start();
+        Thread.sleep(15000);
+        new ShutdownNode(node).start();
         //String IP = InetAddress.getLocalHost().getHostAddress();
 
 

@@ -22,6 +22,7 @@ public class DiscoveryNode extends Thread {
     private int currentID;
     private int previousID;
     private int nextID;
+    private int counter;
 
     public int getAmount() {
         return amount;
@@ -46,10 +47,10 @@ public class DiscoveryNode extends Thread {
 
     public boolean done;
     public DiscoveryNode(String name) throws IOException {
-        super(name);
-        this.name = name;
+        this.counter = 0;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
+            this.name = name;
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
             this.answerSocket = new DatagramSocket(8001); //socket for answering the broadcast
             this.answerSocket.setBroadcast(true);
@@ -67,7 +68,7 @@ public class DiscoveryNode extends Thread {
         //this.namingServer_IP = "192.168.80.3";
     }
     //Network discovery (multicast)
-    public void start() {
+    public void run() {
         List<String> nodesList = new ArrayList<>();
         List<String> nodesList2 = new ArrayList<>();
         boolean receivedServer = false;
@@ -183,6 +184,7 @@ public class DiscoveryNode extends Thread {
         }
 
     }
+
     public String getServerIP(){
         return this.serverIP;
     }
