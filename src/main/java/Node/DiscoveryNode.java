@@ -23,6 +23,7 @@ public class DiscoveryNode extends Thread {
     private int previousID;
     private int nextID;
     private int counter;
+    private boolean running;
 
     public int getAmount() {
         return amount;
@@ -48,6 +49,7 @@ public class DiscoveryNode extends Thread {
     public boolean done;
     public DiscoveryNode(String name) throws IOException {
         this.counter = 0;
+        this.running = true;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
             this.name = name;
@@ -125,8 +127,9 @@ public class DiscoveryNode extends Thread {
                 // e.printStackTrace();
             }
         }
-        while(true) {
+        while(this.running) {
             try {
+                this.running = ShutdownNode.getRunning();
                 Thread.sleep(900);
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
