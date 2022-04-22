@@ -116,7 +116,7 @@ public class NamingNode {
         /*for local, run this test*/
         NamingNode node = new NamingNode(name);
         //new DiscoveryNode(name).start();
-       //Thread.sleep(15000);
+       Thread.sleep(15000);
         //new ShutdownNode(node).start();
         //String IP = InetAddress.getLocalHost().getHostAddress();
 
