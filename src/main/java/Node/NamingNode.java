@@ -31,7 +31,7 @@ public class NamingNode {
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
         this.name = name;
         //start discovery
-        this.discoveryNode = new DiscoveryNode(name);
+        this.discoveryNode = new DiscoveryNode(name, this);
         this.discoveryNode.start();
 
         //start answer
@@ -101,7 +101,12 @@ public class NamingNode {
         System.out.println("node hostname + IP : " + InetAddress.getLocalHost());
     }
 
-
+    public boolean getRunning(){
+        return this.running;
+    }
+    public void setRunning(boolean r){
+        this.running = r;
+    }
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Starting Node...");
         //turn off most of the logging
@@ -120,7 +125,7 @@ public class NamingNode {
         Thread.sleep(15000);
         new ShutdownNode(node).start();
         //String IP = InetAddress.getLocalHost().getHostAddress();
-
+        node.setRunning(false);
 
         //node.newNode(name, IP);
         //node.getNode(name);

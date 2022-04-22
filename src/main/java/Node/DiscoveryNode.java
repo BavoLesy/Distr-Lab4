@@ -24,6 +24,7 @@ public class DiscoveryNode extends Thread {
     private int nextID;
     private int counter;
     private boolean running;
+    NamingNode node;
 
     public int getAmount() {
         return amount;
@@ -47,7 +48,8 @@ public class DiscoveryNode extends Thread {
 
 
     public boolean done;
-    public DiscoveryNode(String name) throws IOException {
+    public DiscoveryNode(String name, NamingNode node) throws IOException {
+        this.node = node;
         this.counter = 0;
         this.running = true;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
@@ -82,7 +84,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), broadcastAddress, 8001); //broadcast on port 8001
         //DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
-        while ((!receivedAllNodes || !receivedServer) && !ShutdownNode.getRunning()) { // send a datagram packet until the NamingServer answers with a receive packet
+        while ((!receivedAllNodes || !receivedServer) && node.getRunning()) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
                 Thread.sleep(1000);
                 discoverySocket.send(sendPacket);
@@ -122,15 +124,13 @@ public class DiscoveryNode extends Thread {
                 if(nodecounter == amount-1){
                     receivedAllNodes = true;
                 }
-                if(!ShutdownNode.getRunning()){
-                    break;
-                }
+
             }
             catch (IOException | ParseException | InterruptedException e) {
                 // e.printStackTrace();
             }
         }
-        while(!ShutdownNode.getRunning()) {
+        while(node.getRunning()) {
             try {
                 Thread.sleep(900);
                 //System.out.println("still alive");
