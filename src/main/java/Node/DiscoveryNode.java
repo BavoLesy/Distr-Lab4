@@ -100,11 +100,9 @@ public class DiscoveryNode extends Thread {
                         this.amount = (int) (long) ((JSONObject) obj).get("node amount");
                         if (status.equals("OK")) {
                             this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
-                            System.out.println(this.previousID);
                             this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
                             this.previousIP = (String) ((JSONObject) obj).get("previousIP");
                             this.nextIP = (String) ((JSONObject) obj).get("nextIP");
-                            System.out.println(this.previousIP);
                          }
                         break;
                     //make sure we get answer from ALL nodes so use diff IPS
@@ -134,21 +132,21 @@ public class DiscoveryNode extends Thread {
                 String s1 = receivePacket.getAddress().toString();
                 String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
                 String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
-                System.out.println("package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
                 if(status.equals("Discovery")) {
                     if ((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
+                        System.out.println("package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         nodesList2.add(IP);
                         String response;
                         String name = ((JSONObject) obj).get("name").toString();
                         int hash = ToHash.hash(name);
-                        System.out.println("hash: " + hash);
-                        System.out.println("currentID: " + this.currentID);
-                        System.out.println("nextID: " + getNextID());
-                        System.out.println("previousID: " + getPreviousID());
+                        //System.out.println("hash: " + hash);
+                        //System.out.println("currentID: " + this.currentID);
+                        //System.out.println("nextID: " + getNextID());
+                        //System.out.println("previousID: " + getPreviousID());
                         if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
                             this.nextID = hash;
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
@@ -167,6 +165,7 @@ public class DiscoveryNode extends Thread {
                 }
                 //update our previous and next
                 if(status.equals("Shutdown")){
+                    System.out.println("package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                     String sender = ((JSONObject) obj).get("sender").toString();
                     System.out.println("received data: " + receivedData);
                     if(sender.equals("nextNode")){
@@ -182,6 +181,7 @@ public class DiscoveryNode extends Thread {
             }
 
         }
+
     }
     public String getServerIP(){
         return this.serverIP;
