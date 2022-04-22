@@ -127,7 +127,7 @@ public class DiscoveryNode extends Thread {
                 // e.printStackTrace();
             }
         }
-        while(this.running) {
+        while(true) {
             try {
                 Thread.sleep(900);
                 //System.out.println("still alive");
