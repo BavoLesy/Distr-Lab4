@@ -152,10 +152,12 @@ public class DiscoveryNode extends Thread {
                         //System.out.println("previousID: " + getPreviousID());
                         if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
                             this.nextID = hash;
+                            this.nextIP = IP;
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         } else if (hash < this.currentID && (this.previousID < hash || this.previousID == this.currentID)) { //
                             this.previousID = hash;
+                            this.previousIP = IP;
                             response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         } else {
