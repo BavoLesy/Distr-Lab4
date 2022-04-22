@@ -1,5 +1,5 @@
 # Distr-Lab4 commands 
-git reset --hard \n
+git reset --hard
 git pull https://github.com/BavoLesy/Distr-Lab4.git
 mvn package
 mvn spring-boot:run
