@@ -1,4 +1,4 @@
-# Distr-Lab4 commands
+# Distr-Lab4 commands \n
 git reset --hard
 git pull https://github.com/BavoLesy/Distr-Lab4.git
 mvn package
