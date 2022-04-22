@@ -84,6 +84,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (!receivedAllNodes || !receivedServer) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
+                Thread.sleep(1000);
                 discoverySocket.send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 discoverySocket.receive(receivePacket); // receive a packet on this socket
@@ -122,13 +123,12 @@ public class DiscoveryNode extends Thread {
                     receivedAllNodes = true;
                 }
             }
-            catch (IOException | ParseException e) {
+            catch (IOException | ParseException | InterruptedException e) {
                 // e.printStackTrace();
             }
         }
         while(this.running) {
             try {
-
                 Thread.sleep(900);
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
