@@ -100,10 +100,11 @@ public class DiscoveryNode extends Thread {
                         this.amount = (int) (long) ((JSONObject) obj).get("node amount");
                         if (status.equals("OK")) {
                             this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
+                            System.out.println(this.previousID);
                             this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
                             this.previousIP = (String) ((JSONObject) obj).get("previousIP");
                             this.nextIP = (String) ((JSONObject) obj).get("nextIP");
-
+                            System.out.println(this.previousIP);
                          }
                         break;
                     //make sure we get answer from ALL nodes so use diff IPS
@@ -120,7 +121,6 @@ public class DiscoveryNode extends Thread {
                 if(nodecounter == amount-1){
                     receivedAllNodes = true;
                 }
-
             }
             catch (IOException | ParseException | InterruptedException e) {
                 // e.printStackTrace();
@@ -147,8 +147,8 @@ public class DiscoveryNode extends Thread {
                         int hash = ToHash.hash(name);
                         System.out.println("hash: " + hash);
                         System.out.println("currentID: " + this.currentID);
-                        System.out.println("nextID: " + this.nextID);
-                        System.out.println("previousID: " + this.previousID);
+                        System.out.println("nextID: " + getNextID());
+                        System.out.println("previousID: " + getPreviousID());
                         if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
                             this.nextID = hash;
                             response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
