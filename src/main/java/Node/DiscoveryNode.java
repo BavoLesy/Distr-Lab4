@@ -82,7 +82,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), broadcastAddress, 8001); //broadcast on port 8001
         //DatagramPacket sendPacket2 = new DatagramPacket(name.getBytes(), name.length(), broadcastAddress, 8002); //broadcast on port 8002
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
-        while (!receivedAllNodes || !receivedServer) { // send a datagram packet until the NamingServer answers with a receive packet
+        while ((!receivedAllNodes || !receivedServer) && !ShutdownNode.getRunning()) { // send a datagram packet until the NamingServer answers with a receive packet
             try {
                 Thread.sleep(1000);
                 discoverySocket.send(sendPacket);
@@ -122,14 +122,18 @@ public class DiscoveryNode extends Thread {
                 if(nodecounter == amount-1){
                     receivedAllNodes = true;
                 }
+                if(!ShutdownNode.getRunning()){
+                    break;
+                }
             }
             catch (IOException | ParseException | InterruptedException e) {
                 // e.printStackTrace();
             }
         }
-        while(true) {
+        while(running) {
             try {
                 Thread.sleep(900);
+                this.running = ShutdownNode.getRunning();
                 //System.out.println("still alive");
                 answerSocket.receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString();
@@ -182,7 +186,7 @@ public class DiscoveryNode extends Thread {
                     }
 
                 }
-                this.running = ShutdownNode.getRunning();
+
             } catch (IOException | InterruptedException | ParseException e) {
                 //e.printStackTrace();
             }

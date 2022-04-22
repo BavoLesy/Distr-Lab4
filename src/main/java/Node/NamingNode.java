@@ -19,7 +19,7 @@ public class NamingNode {
     private final String namingServer_IP;
     private int hash;
     private static int previousID;
-
+    private boolean running;
     private int amount;
     private String nodes;
     DiscoveryNode discoveryNode;
@@ -27,6 +27,7 @@ public class NamingNode {
 
         //this.namingServer_IP = "192.168.80.3"; //if we do network discovery with broadcasting?
     public NamingNode(String name) throws IOException { //constructor
+        this.running = true;
         this.node_IP = InetAddress.getLocalHost().getHostAddress();
         this.name = name;
         //start discovery
@@ -119,7 +120,6 @@ public class NamingNode {
         Thread.sleep(15000);
         new ShutdownNode(node).start();
         //String IP = InetAddress.getLocalHost().getHostAddress();
-
 
 
         //node.newNode(name, IP);
