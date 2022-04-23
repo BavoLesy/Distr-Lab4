@@ -1,22 +1,22 @@
 package Node;
 
 import java.io.IOException;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 public class ShutdownNode extends Thread{
-    private String name;
-    private int currentID;
-    private int nextID;
-    private int previousID;
-    private String previousIP;
-    private String nextIP;
-    private DatagramSocket shutdownSocket;
+    private final int currentID;
+    private final int nextID;
+    private final int previousID;
+    private final String previousIP;
+    private final String nextIP;
+    private final DatagramSocket shutdownSocket;
 
 
     public ShutdownNode(NamingNode node) throws SocketException, InterruptedException {
-
-        this.name = node.name;
+        String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
         this.previousID = node.discoveryNode.getPreviousID();
@@ -26,7 +26,7 @@ public class ShutdownNode extends Thread{
         this.shutdownSocket.setSoTimeout(1000);
         node.delete(name);
     }
-
+    @Override
     public void start(){
         try {
             System.out.println("Shutting down...");

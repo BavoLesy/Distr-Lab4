@@ -5,7 +5,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,32 +113,33 @@ public class DiscoveryNode extends Thread {
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost());
             this.answerSocket = new DatagramSocket(8001); //socket for answering the broadcast
             this.discoverySocket.setBroadcast(true);
-            this.discoverySocket.setSoTimeout(2000);
+            this.discoverySocket.setSoTimeout(2000); //broadcast after sending
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
-            this.currentIP = InetAddress.getLocalHost().getHostAddress();
-            this.amount = 1;
+            this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
+            this.amount = 1; //start amount
         } catch (SocketException e) {
             this.discoverySocket = null;
-            System.out.println("Something went wrong");
+            this.answerSocket = null;
+            System.out.println("Something went wrong during construction of DiscoveryNode");
             e.printStackTrace();
         }
     }
+    @Override
     public void run() {
         List<String> nodesList = new ArrayList<>(); //list that keeps track of which nodes answered already
         List<String> nodesList2 = new ArrayList<>(); //list that keeps track of which nodes we already received discovery
-        //int nodecounter = 0; //counter used to keep track of how many nodes answered already
         byte[] receive = new byte[512];
-        //send out our name on the broadcastaddress
-        String send = "{\"status\":\"Discovery\"," + "\"name\":" +"\"" + name + "\"" + "}";
+        //Discovery broadcast
+        String send = "{\"status\":\"Discovery\"," + "\"name\":" +"\"" + getNodeName() + "\"" + "}";
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), getBroadcastAddress(), 8001); //broadcast on port 8001
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
-        while (((nodesList.size() < getAmount())) && node.getRunning()) { // send a datagram packet until everyone answers
+        while (((nodesList.size() < getAmount())) && getNode().getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
-                discoverySocket.send(sendPacket);
+                getDiscoverySocket().send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
-                discoverySocket.receive(receivePacket); // receive a packet on this socket
+                getDiscoverySocket().receive(receivePacket); // receive a packet on this socket
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 System.out.println("Packet received from: " + receivePacket.getSocketAddress());
                 System.out.println("received data: " + receivedData);
@@ -148,28 +152,18 @@ public class DiscoveryNode extends Thread {
                         setServerIP(String.valueOf(receivePacket.getAddress().getHostAddress()));
                         setCurrentID((int) (long) ((JSONObject) obj).get("node ID"));
                         setAmount((int) (long) ((JSONObject) obj).get("node amount"));
-                        //this.serverIP = String.valueOf(receivePacket.getAddress().getHostAddress());
-                        //this.currentID = (int) (long) ((JSONObject) obj).get("node ID");
-                        //this.amount = (int) (long) ((JSONObject) obj).get("node amount");
                         if (status.equals("OK")) {
                             setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
                             setNextID((int) (long) ((JSONObject) obj).get("previousID"));
                             setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
                             setNextIP((String) ((JSONObject) obj).get("nextIP"));
-                            //this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
-                            //this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
-                            //this.previousIP = (String) ((JSONObject) obj).get("previousIP");
-                            //this.nextIP = (String) ((JSONObject) obj).get("nextIP");
-
                          }
                         break;
-                    //make sure we get answer from ALL nodes so use diff IPS
                     case "Node":
                         break;
-
                 }
+                //make sure we get answer from ALL nodes so use diff IPS
                 if(!nodesList.contains(receivePacket.getAddress().getHostAddress())) {
-                    //nodecounter++;
                     nodesList.add(receivePacket.getAddress().getHostAddress());
                 }
             }
@@ -177,13 +171,13 @@ public class DiscoveryNode extends Thread {
                 // e.printStackTrace();
             }
         }
-        while(node.getRunning()) {
+        while(getNode().getRunning()) {
             try {
                 //Thread.sleep(900);
-                answerSocket.receive(receivePacket);
-                String s1 = receivePacket.getAddress().toString();
-                String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
-                String IP = receivePacket.getAddress().getHostAddress(); //IP of the Current Node
+                getAnswerSocket().receive(receivePacket);
+                String s1 = receivePacket.getAddress().toString(); //IP of the sending node
+                String s2 = "/" + InetAddress.getLocalHost().getHostAddress(); //IP of the current node
+                String IP = receivePacket.getAddress().getHostAddress(); //IP of the sending node
                 String receivedData = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
@@ -191,30 +185,26 @@ public class DiscoveryNode extends Thread {
                 if(status.equals("Discovery")) {
                     if ((!s1.equals(s2)) && (!nodesList2.contains(IP))) { // We only listen to other IP than our own and only IPs we havent listened to.
                         System.out.println("Package received from: " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                        nodesList2.add(IP);
+                        nodesList2.add(IP); //add to our list of received IPs
                         String response;
                         String name = ((JSONObject) obj).get("name").toString();
                         int hash = ToHash.hash(name);
-                        //System.out.println("hash: " + hash);
-                        //System.out.println("currentID: " + this.currentID);
-                        //System.out.println("nextID: " + getNextID());
-                        //System.out.println("previousID: " + getPreviousID());
-                        if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
-                            this.nextID = hash;
-                            this.nextIP = IP;
-                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
-                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
-                        } else if (hash < this.currentID && (this.previousID < hash || this.previousID == this.currentID)) { //
-                            this.previousID = hash;
-                            this.previousIP = IP;
-                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
-                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
+                        if (getCurrentID() < hash && (hash < getNextID() || getNextID() == getCurrentID())) {
+                            setNextID(hash);
+                            setNextIP(IP);
+                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
+                                    "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
+                        } else if (hash < getCurrentID() && (getPreviousID() < hash || getPreviousID() == getCurrentID())) {
+                            setPreviousID(hash);
+                            setPreviousIP(IP);
+                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
+                                    "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                         } else {
-                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
-                                    "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
+                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + getCurrentID() + "," +
+                                    "\"nextID\":" + getNextID() + "," + "\"previousID\":" + getPreviousID() + "}";
                         }
                         DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
-                        this.answerSocket.send(responsePacket);
+                        getAnswerSocket().send(responsePacket);
                     }
                 }
                 //If a neighbour node shuts down, handle this packet and update our neighbours
@@ -227,8 +217,6 @@ public class DiscoveryNode extends Thread {
                         if (sender.equals("nextNode")) { // If the sender is the next neighbour
                             setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
                             setNextIP((String) ((JSONObject) obj).get("nextIP"));
-                            //this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
-                            //this.nextIP = (String) ((JSONObject) obj).get("nextIP");
                             if (senderID == getNextID()) { // If the sender is the last node
                                 setNextID(getCurrentID()); //make current node the last node
                                 setNextIP(getCurrentIP());
@@ -236,8 +224,6 @@ public class DiscoveryNode extends Thread {
                         } else if (sender.equals("previousNode")) {
                             setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
                             setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
-                            //this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
-                            //this.previousIP = (String) ((JSONObject) obj).get("previousIP");
                             if (senderID == getPreviousID()) { // If the sender is the last node
                                 setPreviousID(getCurrentID()); //make current node the last node
                                 setPreviousIP(getCurrentIP());

@@ -17,7 +17,7 @@ public class Discovery extends Thread {
     public Discovery(NamingServer nameserver){
         this.ns = nameserver;
         try{
-            this.socket = new DatagramSocket(8001); // receivingPort
+            this.socket = new DatagramSocket(8001); // socket where we will receive discovery on
             this.socket.setBroadcast(true);
             this.socket.setSoTimeout(1000);
         } catch (SocketException e) {
@@ -64,13 +64,12 @@ public class Discovery extends Thread {
                         NamingServer.ipMapLock.readLock().unlock();
                     } else {
                         //adding unsuccessful
-                        ns.logger.info("Adding node failed");
+                        ns.logger.info("Node already exists");
                         response = "{\"status\":\"Node already exists\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + hash + "," +
                                 "\"node amount\":" + NamingServer.getIpMapping().size() + "}";
                     }
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.socket.send(responsePacket);
-                    //sending port = 8000
                 }
                 } catch (IOException | ParseException e) {
                 //e.printStackTrace();

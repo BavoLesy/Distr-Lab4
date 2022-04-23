@@ -17,15 +17,14 @@ public class NamingServer extends Thread{
     private static final TreeMap<Integer, String> ipMapping = new TreeMap<>();
     static ReadWriteLock ipMapLock = new ReentrantReadWriteLock(); //lock to avoid reading when someone else is writing and vice versa
     Discovery discovery;
+
     public NamingServer() {
         this.discovery = new Discovery(this);
         this.discovery.start();
     }
-
     public static TreeMap<Integer, String> getIpMapping() {
         return ipMapping;
     }
-
     public static ReadWriteLock getIpMapLock() {
         return ipMapLock;
     }
