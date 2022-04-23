@@ -132,7 +132,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (((nodesList.size() < getAmount())) && node.getRunning()) { // send a datagram packet until everyone answers
             try {
-                //Thread.sleep(1000);
+                Thread.sleep(1000);
                 discoverySocket.send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 discoverySocket.receive(receivePacket); // receive a packet on this socket
@@ -173,7 +173,7 @@ public class DiscoveryNode extends Thread {
                     nodesList.add(receivePacket.getAddress().getHostAddress());
                 }
             }
-            catch (IOException | ParseException e) {
+            catch (IOException | ParseException | InterruptedException e) {
                 // e.printStackTrace();
             }
         }
