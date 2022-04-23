@@ -102,9 +102,6 @@ public class DiscoveryNode extends Thread {
         return node;
     }
 
-
-
-
     public DiscoveryNode(String name, NamingNode node) throws IOException {
         this.node = node;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast

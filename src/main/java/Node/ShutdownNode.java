@@ -14,8 +14,7 @@ public class ShutdownNode extends Thread{
     private final String nextIP;
     private final DatagramSocket shutdownSocket;
 
-
-    public ShutdownNode(NamingNode node) throws SocketException, InterruptedException {
+    public ShutdownNode(NamingNode node) throws SocketException {
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
