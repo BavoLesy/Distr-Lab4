@@ -202,15 +202,15 @@ public class DiscoveryNode extends Thread {
                         if (this.currentID < hash && (hash < this.nextID || this.nextID == this.currentID)) {
                             this.nextID = hash;
                             this.nextIP = IP;
-                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                            response = "{\"status\":\"nextID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         } else if (hash < this.currentID && (this.previousID < hash || this.previousID == this.currentID)) { //
                             this.previousID = hash;
                             this.previousIP = IP;
-                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                            response = "{\"status\":\"previousID changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         } else {
-                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"currentID\":" + this.currentID + "," +
+                            response = "{\"status\":\"Nothing changed\"," + "\"sender\":\"Node\"," + "\"senderID\":" + this.currentID + "," +
                                     "\"nextID\":" + this.nextID + "," + "\"previousID\":" + this.previousID + "}";
                         }
                         DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
@@ -223,7 +223,7 @@ public class DiscoveryNode extends Thread {
                         System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         String sender = ((JSONObject) obj).get("sender").toString(); //get the sender, either nextNode or PreviousNode
-                        int senderID = (int) (long) ((JSONObject) obj).get("currentID"); //get senderID
+                        int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         if (sender.equals("nextNode")) { // If the sender is the next neighbour
                             setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
                             setNextIP((String) ((JSONObject) obj).get("nextIP"));

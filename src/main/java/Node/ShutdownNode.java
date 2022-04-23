@@ -33,11 +33,11 @@ public class ShutdownNode extends Thread{
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets
             String previousResponse;
             String nextResponse;
-            previousResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"nextNode\"," + "\"currentID\":" + currentID + "," +
+            previousResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"nextNode\"," + "\"senderID\":" + currentID + "," +
                 "\"nextID\":" + nextID + ","+ "\"nextIP\":" + "\"" + nextIP + "\"" + "}";
             DatagramPacket previousNode = new DatagramPacket(previousResponse.getBytes(), previousResponse.length(), InetAddress.getByName(previousIP), 8001);
             shutdownSocket.send(previousNode);
-            nextResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"previousNode\"," + "\"currentID\":" + currentID + "," + "\"previousID\":" + previousID + "," + "\"previousIP\":" + "\"" + previousIP + "\"" + "}";
+            nextResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"previousNode\"," + "\"senderID\":" + currentID + "," + "\"previousID\":" + previousID + "," + "\"previousIP\":" + "\"" + previousIP + "\"" + "}";
             DatagramPacket nextNode = new DatagramPacket(nextResponse.getBytes(), nextResponse.length(), InetAddress.getByName(nextIP), 8001);
             shutdownSocket.send(nextNode);
         } catch (IOException e) {
