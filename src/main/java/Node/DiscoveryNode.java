@@ -107,12 +107,12 @@ public class DiscoveryNode extends Thread {
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
             this.name = name;
-            this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost()); // receivingPort
+            this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost());
             this.answerSocket = new DatagramSocket(8001); //socket for answering the broadcast
+            this.discoverySocket.setBroadcast(true);
+            this.discoverySocket.setSoTimeout(2000);
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
-            this.discoverySocket.setBroadcast(true);
-            this.discoverySocket.setSoTimeout(1000);
             this.currentIP = InetAddress.getLocalHost().getHostAddress();
             this.amount = 1;
         } catch (SocketException e) {

@@ -19,7 +19,7 @@ public class Discovery extends Thread {
         try{
             this.socket = new DatagramSocket(8001); // receivingPort
             this.socket.setBroadcast(true);
-            this.socket.setSoTimeout(1100);
+            this.socket.setSoTimeout(1000);
         } catch (SocketException e) {
             this.socket = null;
             System.out.println("Something went wrong");
@@ -34,7 +34,7 @@ public class Discovery extends Thread {
         while (this.running) {
             try {
                 this.socket.receive(receivePacket);
-                System.out.println("package received! -> " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                System.out.println("Package received from: " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                 String receivedData = new String(receivePacket.getData(),0,receivePacket.getLength()).trim();
                 System.out.println("received data: " + receivedData);
                 JSONParser parser = new JSONParser();
