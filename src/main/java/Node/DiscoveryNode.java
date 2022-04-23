@@ -132,7 +132,7 @@ public class DiscoveryNode extends Thread {
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
         while (((nodesList.size() < getAmount())) && node.getRunning()) { // send a datagram packet until everyone answers
             try {
-                Thread.sleep(1000);
+                //Thread.sleep(1000);
                 discoverySocket.send(sendPacket);
                 System.out.println("sent packet to: " + sendPacket.getSocketAddress());
                 discoverySocket.receive(receivePacket); // receive a packet on this socket
@@ -173,13 +173,13 @@ public class DiscoveryNode extends Thread {
                     nodesList.add(receivePacket.getAddress().getHostAddress());
                 }
             }
-            catch (IOException | ParseException | InterruptedException e) {
+            catch (IOException | ParseException e) {
                 // e.printStackTrace();
             }
         }
         while(node.getRunning()) {
             try {
-                Thread.sleep(900);
+                //Thread.sleep(900);
                 answerSocket.receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString();
                 String s2 = "/" + InetAddress.getLocalHost().getHostAddress();
@@ -219,32 +219,34 @@ public class DiscoveryNode extends Thread {
                 }
                 //If a neighbour node shuts down, handle this packet and update our neighbours
                 if(status.equals("Shutdown")){
-                    System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
-                    System.out.println("received data: " + receivedData);
-                    String sender = ((JSONObject) obj).get("sender").toString(); //get the sender, either nextNode or PreviousNode
-                    int senderID = (int) (long) ((JSONObject) obj).get("currentID"); //get senderID
-                    if(sender.equals("nextNode")){ // If the sender is the next neighbour
-                        setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
-                        setNextIP((String) ((JSONObject) obj).get("nextIP"));
-                        //this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
-                        //this.nextIP = (String) ((JSONObject) obj).get("nextIP");
-                        if(senderID == getNextID()){ // If the sender is the last node
-                            setNextID(getCurrentID()); //make current node the last node
-                            setNextIP(getCurrentIP());
+                    if(!s1.equals(s2)) {
+                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("received data: " + receivedData);
+                        String sender = ((JSONObject) obj).get("sender").toString(); //get the sender, either nextNode or PreviousNode
+                        int senderID = (int) (long) ((JSONObject) obj).get("currentID"); //get senderID
+                        if (sender.equals("nextNode")) { // If the sender is the next neighbour
+                            setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
+                            setNextIP((String) ((JSONObject) obj).get("nextIP"));
+                            //this.nextID = (int) (long) ((JSONObject) obj).get("nextID");
+                            //this.nextIP = (String) ((JSONObject) obj).get("nextIP");
+                            if (senderID == getNextID()) { // If the sender is the last node
+                                setNextID(getCurrentID()); //make current node the last node
+                                setNextIP(getCurrentIP());
+                            }
+                        } else if (sender.equals("previousNode")) {
+                            setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
+                            setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
+                            //this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
+                            //this.previousIP = (String) ((JSONObject) obj).get("previousIP");
+                            if (senderID == getPreviousID()) { // If the sender is the last node
+                                setPreviousID(getCurrentID()); //make current node the last node
+                                setPreviousIP(getCurrentIP());
+                            }
                         }
-                    }else if(sender.equals("previousNode")){
-                        setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
-                        setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
-                        //this.previousID = (int) (long) ((JSONObject) obj).get("previousID");
-                        //this.previousIP = (String) ((JSONObject) obj).get("previousIP");
-                        if(senderID == getPreviousID()){ // If the sender is the last node
-                            setPreviousID(getCurrentID()); //make current node the last node
-                            setPreviousIP(getCurrentIP());
-                        }
+                        setAmount(getAmount() - 1); // Lower amount by 1 because there is one less node
                     }
-                    setAmount(getAmount()-1); // Lower amount by 1 because there is one less node
                 }
-            } catch (IOException | InterruptedException | ParseException e) {
+            } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }
 
