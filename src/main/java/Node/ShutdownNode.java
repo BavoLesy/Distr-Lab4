@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 public class ShutdownNode extends Thread{
+    private final NamingNode node;
     private final int currentID;
     private final int nextID;
     private final int previousID;
@@ -15,6 +16,7 @@ public class ShutdownNode extends Thread{
     private final DatagramSocket shutdownSocket;
 
     public ShutdownNode(NamingNode node) throws SocketException {
+        this.node = node;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();
         this.nextID = node.discoveryNode.getNextID();
@@ -26,7 +28,7 @@ public class ShutdownNode extends Thread{
         node.delete(ToHash.hash(name));
     }
     @Override
-    public void start(){
+    public void run(){
         try {
             System.out.println("Shutting down...");
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets
@@ -39,6 +41,7 @@ public class ShutdownNode extends Thread{
             nextResponse = "{\"status\":\"Shutdown\"," + "\"sender\":\"previousNode\"," + "\"senderID\":" + currentID + "," + "\"previousID\":" + previousID + "," + "\"previousIP\":" + "\"" + previousIP + "\"" + "}";
             DatagramPacket nextNode = new DatagramPacket(nextResponse.getBytes(), nextResponse.length(), InetAddress.getByName(nextIP), 8001);
             shutdownSocket.send(nextNode);
+            this.node.setRunning(false);
         } catch (IOException e) {
             e.printStackTrace();
         }

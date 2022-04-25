@@ -98,7 +98,6 @@ public class NamingNode {
         new PingNode(node).start();
         Thread.sleep(60000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
-        node.setRunning(false); //turn off the node
         //node.newNode(name, IP);
         //node.getNode(name);
         //node.printOut();
