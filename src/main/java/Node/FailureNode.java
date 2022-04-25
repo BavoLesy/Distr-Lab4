@@ -31,7 +31,7 @@ public class FailureNode extends Thread {
         this.serverIP = node.discoveryNode.getServerIP();
         this.nextIP = node.discoveryNode.getNextIP();
         this.previousIP = node.discoveryNode.getPreviousIP();
-        this.failureSocket = new DatagramSocket(8003);
+        this.failureSocket = node.discoveryNode.getFailureSocket();
         this.failureSocket.setSoTimeout(1000);
     }
     @Override
@@ -43,7 +43,7 @@ public class FailureNode extends Thread {
                     "\"failedID\":" + failedNode + "}";
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets
             DatagramPacket server = new DatagramPacket(serverResponse.getBytes(), serverResponse.length(), InetAddress.getByName(serverIP), 8001);
-            failureSocket.send(server);
+            this.failureSocket.send(server);
         } catch (IOException e) {
             e.printStackTrace();
         }

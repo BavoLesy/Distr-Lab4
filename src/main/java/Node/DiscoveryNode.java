@@ -16,6 +16,7 @@ import java.util.List;
 public class DiscoveryNode extends Thread {
     private DatagramSocket discoverySocket; //socket used for discovery
     private DatagramSocket answerSocket; //socket used to answer discoveries / shutdowns
+    private DatagramSocket failureSocket;
     private final InetAddress broadcastAddress; //address used to broadcast
     private int amount; //amount of nodes in the system
     private String currentIP; //IP of the node
@@ -33,6 +34,13 @@ public class DiscoveryNode extends Thread {
 
 
     /*GETTERS AND SETTERS*/
+
+    public DatagramSocket getFailureSocket() {
+        return failureSocket;
+    }
+    public void setFailureSocket(DatagramSocket failureSocket) {
+        this.failureSocket = failureSocket;
+    }
     public int getPreviousAnswer() {
         return previousAnswer;
     }
@@ -132,6 +140,8 @@ public class DiscoveryNode extends Thread {
             this.name = name;
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost());
             this.answerSocket = new DatagramSocket(8001); //socket for answering the broadcast
+            this.failureSocket = new DatagramSocket(8003);
+            this.failureSocket.setSoTimeout(1000);
             this.discoverySocket.setBroadcast(true);
             this.discoverySocket.setSoTimeout(2000); //broadcast after sending
             this.answerSocket.setBroadcast(true);

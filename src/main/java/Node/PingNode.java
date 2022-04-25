@@ -35,11 +35,11 @@ public class PingNode extends Thread{
                 try {
                     if(this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getPreviousID()) {
                         this.namingNode.discoveryNode.getAnswerSocket().send(previousPing);
-                        this.namingNode.discoveryNode.setPreviousAnswer(this.namingNode.discoveryNode.getPreviousAnswer() + 1);
+                        this.namingNode.discoveryNode.setNextAnswer(this.namingNode.discoveryNode.getNextAnswer()+1);
                     }
                     if (this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getNextID()) {
                         this.namingNode.discoveryNode.getAnswerSocket().send(nextPing);
-                        this.namingNode.discoveryNode.setNextAnswer(this.namingNode.discoveryNode.getNextAnswer()+1);
+                        this.namingNode.discoveryNode.setPreviousAnswer(this.namingNode.discoveryNode.getPreviousAnswer()+1);
                     }
                 } catch (IOException e) {
                     //e.printStackTrace();
