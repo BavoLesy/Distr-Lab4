@@ -285,10 +285,10 @@ public class DiscoveryNode extends Thread {
                         System.out.println("received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
                         if (senderID == getPreviousID()){
-                            setPreviousAnswer(getPreviousAnswer()-1);
+                            setPreviousAnswer(0);
                         }
                         if(senderID == getNextID()){
-                            setNextAnswer(getNextAnswer()-1);
+                            setNextAnswer(0);
                         }
                     }               }
             } catch (IOException | ParseException e) {
