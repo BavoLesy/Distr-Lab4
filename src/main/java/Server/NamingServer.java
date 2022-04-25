@@ -49,18 +49,17 @@ public class NamingServer extends Thread{
         return "Added Node " + name + " with hash: " + hash +"\n";
     }
     @DeleteMapping("/NamingServer/Nodes/{node}")
-    public String removeNode(@PathVariable(value = "node") String name){
-        int hash = hash(name);
-        this.logger.info("Removing node: " + name + " with hash: " + hash);
+    public String removeNode(@PathVariable(value = "node") int hash){
+        this.logger.info("Removing node with hash: " + hash);
         ipMapLock.writeLock().lock();
         if (!ipMapping.containsKey(hash)) {
             ipMapLock.writeLock().unlock();
-            return "Node " + name + " with hash: " + hash + " does not exist\n";
+            return "Node with hash: " + hash + " does not exist\n";
         }
         ipMapping.remove(hash);
         JSON_Handler.writeFile();
         ipMapLock.writeLock().unlock();
-        return "Node " + name + " with hash: " + hash + " was removed\n";
+        return "Node with hash: " + hash + " was removed\n";
     }
     @GetMapping("/NamingServer/Files/{filename}")
     public String getFile(@PathVariable(value = "filename") String fileName) {
@@ -84,6 +83,7 @@ public class NamingServer extends Thread{
         if(getIpMapping().containsKey(hash)) {
             int i = 1;
             StringBuilder nodes = new StringBuilder();
+
             for (Map.Entry<Integer, String> entry : entries) {
                 nodes.append("Node #");
                 nodes.append(i);

@@ -229,6 +229,19 @@ public class DiscoveryNode extends Thread {
                         setAmount(getAmount() - 1); // Lower amount by 1 because there is one less node
                     }
                 }
+                if(status.equals("FailureOK")){
+                    if(!s1.equals(s2)) {
+                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("received data: " + receivedData);
+                        int removedID = (int) (long) ((JSONObject) obj).get("removedID"); //get removedID
+                        setNextID((int) (long) ((JSONObject) obj).get("nextID")); //update neighbour
+                        setNextIP((String) ((JSONObject) obj).get("nextIP"));
+                        setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
+                        setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
+                        setAmount((int) (long) ((JSONObject) obj).get("node amount"));
+                    }
+
+                }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }

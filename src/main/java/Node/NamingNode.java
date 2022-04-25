@@ -60,9 +60,9 @@ public class NamingNode {
         System.out.println(Unirest.post(URL).header("Content-Type", "application/json").body(IP).asString().getBody());
 
     }
-    public void delete(String user){
+    public void delete(int hash){
         try {
-            String url = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + user;
+            String url = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + hash;
             System.out.println(Unirest.delete(url).asString().getBody());
         } catch (Exception e) {
             e.printStackTrace();

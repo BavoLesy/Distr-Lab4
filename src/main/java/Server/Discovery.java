@@ -40,9 +40,9 @@ public class Discovery extends Thread {
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(receivedData);
                 String status = ((JSONObject) obj).get("status").toString();
-                String name = ((JSONObject) obj).get("name").toString();
-                int hash = ns.hash(name);
                 if(status.equals("Discovery")) {
+                    String name = ((JSONObject) obj).get("name").toString();
+                    int hash = ns.hash(name);
                     String IP = receivePacket.getAddress().getHostAddress(); //IP of the Node
                     String response;
                     if (ns.addNode(name, IP).equals("Added Node " + name + " with hash: " + hash + "\n")) {
@@ -70,7 +70,35 @@ public class Discovery extends Thread {
                     }
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.socket.send(responsePacket);
+                }else if(status.equals("Failure")){
+                    Integer senderID = (int) (long) ((JSONObject) obj).get("senderID");
+                    Integer failedID = (int) (long) ((JSONObject) obj).get("failedID");
+                    String response;
+                    if(ns.removeNode(failedID).equals("Node with hash: " + failedID + " was removed\n")){
+                        NamingServer.ipMapLock.readLock().lock();
+                        ns.logger.info(NamingServer.getIpMapping().toString());
+                        Integer previousID = NamingServer.getIpMapping().lowerKey(senderID);
+                        if (previousID == null) previousID = senderID;
+                        ns.logger.info(previousID.toString());
+                        Integer nextID = NamingServer.getIpMapping().higherKey(senderID);
+                        if (nextID == null) nextID = senderID;
+                        ns.logger.info(nextID.toString());
+                        String previousIP = NamingServer.getIpMapping().get(previousID);
+                        String nextIP = NamingServer.getIpMapping().get(nextID);
+                        response = "{\"status\":\"FailureOK\"," + "\"sender\":\"NamingServer\"," + "\"removedID\":" + failedID + "," +
+                                "\"node amount\":" + NamingServer.getIpMapping().size() + ","
+                                + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "," + "\"previousIP\":" + "\"" +
+                                previousIP + "\"" +  "," + "\"nextIP\":" + "\"" + nextIP + "\"" + "}";
+                    }
+                    else{
+                        ns.logger.info("Node we tried to remove does not exist");
+                        response = "{\"status\":\"Node does not exist\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + failedID + "," +
+                                "\"node amount\":" + NamingServer.getIpMapping().size() + "}";
+                    }
+                    DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), 8001);
+                    this.socket.send(responsePacket);
                 }
+
                 } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }
