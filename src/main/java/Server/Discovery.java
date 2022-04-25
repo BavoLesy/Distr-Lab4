@@ -71,8 +71,8 @@ public class Discovery extends Thread {
                     DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), receivePacket.getPort());
                     this.socket.send(responsePacket);
                 }else if(status.equals("Failure")){
-                    Integer senderID = (int) (long) ((JSONObject) obj).get("senderID");
-                    Integer failedID = (int) (long) ((JSONObject) obj).get("failedID");
+                    int senderID = (int) (long) ((JSONObject) obj).get("senderID");
+                    int failedID = (int) (long) ((JSONObject) obj).get("failedID");
                     String response;
                     if(ns.removeNode(failedID).equals("Node with hash: " + failedID + " was removed\n")){
                         NamingServer.ipMapLock.readLock().lock();

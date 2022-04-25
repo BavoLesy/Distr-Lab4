@@ -95,10 +95,10 @@ public class NamingNode {
             return;
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
+        new PingNode(node).start();
         Thread.sleep(15000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
         node.setRunning(false); //turn off the node
-
         //node.newNode(name, IP);
         //node.getNode(name);
         //node.printOut();

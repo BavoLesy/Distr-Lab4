@@ -31,9 +31,8 @@ public class FailureNode extends Thread {
         this.serverIP = node.discoveryNode.getServerIP();
         this.nextIP = node.discoveryNode.getNextIP();
         this.previousIP = node.discoveryNode.getPreviousIP();
-        this.failureSocket = new DatagramSocket(8002);
+        this.failureSocket = new DatagramSocket(8003);
         this.failureSocket.setSoTimeout(1000);
-        node.delete(failedNode);
     }
     @Override
     public void run() {

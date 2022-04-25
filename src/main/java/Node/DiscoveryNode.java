@@ -27,8 +27,30 @@ public class DiscoveryNode extends Thread {
     private int nextID; //ID of the next node
     private String name; //name of the current node
     private final NamingNode node; //NamingNode
+    private boolean discoveryPhase;
+    private int previousAnswer;
+    private int nextAnswer;
+
 
     /*GETTERS AND SETTERS*/
+    public int getPreviousAnswer() {
+        return previousAnswer;
+    }
+    public void setPreviousAnswer(int previousAnswer) {
+        this.previousAnswer = previousAnswer;
+    }
+    public int getNextAnswer() {
+        return nextAnswer;
+    }
+    public void setNextAnswer(int nextAnswer) {
+        this.nextAnswer = nextAnswer;
+    }
+    public boolean isDiscoveryPhase() {
+        return discoveryPhase;
+    }
+    public void setDiscoveryPhase(boolean discoveryPhase) {
+        this.discoveryPhase = discoveryPhase;
+    }
     public DatagramSocket getDiscoverySocket() {
         return discoverySocket;
     }
@@ -106,6 +128,7 @@ public class DiscoveryNode extends Thread {
         this.node = node;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
+            this.discoveryPhase = true;
             this.name = name;
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost());
             this.answerSocket = new DatagramSocket(8001); //socket for answering the broadcast
@@ -131,7 +154,7 @@ public class DiscoveryNode extends Thread {
         String send = "{\"status\":\"Discovery\"," + "\"name\":" +"\"" + getNodeName() + "\"" + "}";
         DatagramPacket sendPacket = new DatagramPacket(send.getBytes(StandardCharsets.UTF_8), send.length(), getBroadcastAddress(), 8001); //broadcast on port 8001
         DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);  // receivePacket
-        while (((nodesList.size() < getAmount())) && getNode().getRunning()) { // send a datagram packet until everyone answers
+        while (isDiscoveryPhase() && getNode().getRunning()) { // send a datagram packet until everyone answers
             try {
                 Thread.sleep(1000);
                 getDiscoverySocket().send(sendPacket);
@@ -162,6 +185,10 @@ public class DiscoveryNode extends Thread {
                 //make sure we get answer from ALL nodes so use diff IPS
                 if(!nodesList.contains(receivePacket.getAddress().getHostAddress())) {
                     nodesList.add(receivePacket.getAddress().getHostAddress());
+
+                }
+                if(nodesList.size() >= getAmount()){
+                    setDiscoveryPhase(false);
                 }
             }
             catch (IOException | ParseException | InterruptedException e) {
@@ -240,8 +267,17 @@ public class DiscoveryNode extends Thread {
                         setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
                         setAmount((int) (long) ((JSONObject) obj).get("node amount"));
                     }
-
-                }
+                }if(status.equals("Ping")){
+                    if(!s1.equals(s2)) {
+                        System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
+                        System.out.println("received data: " + receivedData);
+                        int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
+                        if (senderID == previousID){
+                            setPreviousAnswer(getPreviousAnswer()-1);
+                        }else if(senderID == nextID){
+                            setNextAnswer(getNextAnswer()-1);
+                        }
+                    }               }
             } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }
