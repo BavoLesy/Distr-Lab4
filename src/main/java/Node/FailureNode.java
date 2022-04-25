@@ -23,6 +23,7 @@ public class FailureNode extends Thread {
     the nameserver for its new neighbours. Lastly, we remove this missing node from the naming server
      */
     public FailureNode(NamingNode node, int failedNode) throws SocketException {
+        this.setDaemon(true);
         this.failedNode = failedNode;
         String name = node.name;
         this.currentID = node.discoveryNode.getCurrentID();

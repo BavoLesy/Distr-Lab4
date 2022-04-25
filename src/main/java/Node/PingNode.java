@@ -11,6 +11,7 @@ public class PingNode extends Thread{
     private NamingNode namingNode;
     public PingNode(NamingNode node){
         this.namingNode = node;
+        this.setDaemon(true);
     }
     public void run(){
         while(namingNode.getRunning()){
