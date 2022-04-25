@@ -33,9 +33,9 @@ public class PingNode extends Thread{
                 String ping = "{\"status\":\"Ping\"," + "\"senderID\":" + this.namingNode.discoveryNode.getCurrentID() + "}";
                 DatagramPacket previousPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), previousIP, 8001);
                 DatagramPacket nextPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), nextIP, 8001);
-                System.out.println("PREVIOUSID = " + this.namingNode.discoveryNode.getPreviousID());
-                System.out.println("NEXTID = " + this.namingNode.discoveryNode.getNextID());
-                System.out.println("CURRENTID = " + this.namingNode.discoveryNode.getCurrentID());
+                //System.out.println("PREVIOUSID = " + this.namingNode.discoveryNode.getPreviousID());
+                //System.out.println("NEXTID = " + this.namingNode.discoveryNode.getNextID());
+                //System.out.println("CURRENTID = " + this.namingNode.discoveryNode.getCurrentID());
                 try {
                     if(this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getPreviousID()) {
                         this.namingNode.discoveryNode.getAnswerSocket().send(previousPing);
@@ -52,6 +52,7 @@ public class PingNode extends Thread{
                 if(this.namingNode.discoveryNode.getPreviousAnswer() > 3){ //If we ping 3 times without receiving an answer then failure
                     try {
                         new FailureNode(this.namingNode,this.namingNode.discoveryNode.getPreviousID()).start(); //assume failure of that node
+                        this.namingNode.discoveryNode.setPreviousAnswer(0);
                     } catch (SocketException e) {
                         //e.printStackTrace();
                     }
@@ -59,6 +60,7 @@ public class PingNode extends Thread{
                 if(this.namingNode.discoveryNode.getNextAnswer() > 3){
                     try {
                         new FailureNode(this.namingNode,this.namingNode.discoveryNode.getNextID()).start();
+                        this.namingNode.discoveryNode.setNextAnswer(0);
                     } catch (SocketException e) {
                         e.printStackTrace();
                     }
