@@ -9,13 +9,9 @@ import java.nio.charset.StandardCharsets;
 
 public class PingNode extends Thread{
     private NamingNode namingNode;
-
-
     public PingNode(NamingNode node){
         this.namingNode = node;
-
     }
-
     public void run(){
         while(namingNode.getRunning()){
             try {
@@ -37,10 +33,14 @@ public class PingNode extends Thread{
                 DatagramPacket previousPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), previousIP, 8001);
                 DatagramPacket nextPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), nextIP, 8001);
                 try {
-                    this.namingNode.discoveryNode.getAnswerSocket().send(previousPing);
-                    this.namingNode.discoveryNode.setPreviousAnswer(this.namingNode.discoveryNode.getPreviousAnswer()+1);
-                    this.namingNode.discoveryNode.getAnswerSocket().send(nextPing);
-                    this.namingNode.discoveryNode.setNextAnswer(this.namingNode.discoveryNode.getNextAnswer()+1);
+                    if(this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getPreviousID()) {
+                        this.namingNode.discoveryNode.getAnswerSocket().send(previousPing);
+                        this.namingNode.discoveryNode.setPreviousAnswer(this.namingNode.discoveryNode.getPreviousAnswer() + 1);
+                    }
+                    if (this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getNextID()) {
+                        this.namingNode.discoveryNode.getAnswerSocket().send(nextPing);
+                        this.namingNode.discoveryNode.setNextAnswer(this.namingNode.discoveryNode.getNextAnswer()+1);
+                    }
                 } catch (IOException e) {
                     //e.printStackTrace();
                 }
