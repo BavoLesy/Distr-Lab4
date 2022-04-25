@@ -136,6 +136,8 @@ public class DiscoveryNode extends Thread {
         this.node = node;
         this.broadcastAddress = InetAddress.getByName("255.255.255.255"); //Broadcast
         try{
+            this.nextAnswer = 0;
+            this.previousAnswer = 0;
             this.discoveryPhase = true;
             this.name = name;
             this.discoverySocket = new DatagramSocket(8000, InetAddress.getLocalHost());
@@ -282,9 +284,10 @@ public class DiscoveryNode extends Thread {
                         System.out.println("Package received from:  " + receivePacket.getAddress() + ":" + receivePacket.getPort());
                         System.out.println("received data: " + receivedData);
                         int senderID = (int) (long) ((JSONObject) obj).get("senderID"); //get senderID
-                        if (senderID == previousID){
+                        if (senderID == getPreviousID()){
                             setPreviousAnswer(getPreviousAnswer()-1);
-                        }else if(senderID == nextID){
+                        }
+                        if(senderID == getNextID()){
                             setNextAnswer(getNextAnswer()-1);
                         }
                     }               }

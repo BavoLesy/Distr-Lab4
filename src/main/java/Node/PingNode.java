@@ -32,6 +32,9 @@ public class PingNode extends Thread{
                 String ping = "{\"status\":\"Ping\"," + "\"senderID\":" + this.namingNode.discoveryNode.getCurrentID() + "}";
                 DatagramPacket previousPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), previousIP, 8001);
                 DatagramPacket nextPing = new DatagramPacket(ping.getBytes(StandardCharsets.UTF_8), ping.length(), nextIP, 8001);
+                System.out.println("PREVIOUSID = " + this.namingNode.discoveryNode.getPreviousID());
+                System.out.println("NEXTID = " + this.namingNode.discoveryNode.getNextID());
+                System.out.println("CURRENTID = " + this.namingNode.discoveryNode.getCurrentID());
                 try {
                     if(this.namingNode.discoveryNode.getCurrentID() != this.namingNode.discoveryNode.getPreviousID()) {
                         this.namingNode.discoveryNode.getAnswerSocket().send(previousPing);
