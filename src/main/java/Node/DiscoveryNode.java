@@ -186,7 +186,7 @@ public class DiscoveryNode extends Thread {
                         setAmount((int) (long) ((JSONObject) obj).get("node amount"));
                         if (status.equals("OK")) {
                             setPreviousID((int) (long) ((JSONObject) obj).get("previousID"));
-                            setNextID((int) (long) ((JSONObject) obj).get("previousID"));
+                            setNextID((int) (long) ((JSONObject) obj).get("nextID"));
                             setPreviousIP((String) ((JSONObject) obj).get("previousIP"));
                             setNextIP((String) ((JSONObject) obj).get("nextIP"));
                          }
