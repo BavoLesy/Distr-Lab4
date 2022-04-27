@@ -73,9 +73,9 @@ public class Discovery extends Thread {
                 }else if(status.equals("Failure")) {
                     int senderID = (int) (long) ((JSONObject) obj).get("senderID");
                     int failedID = (int) (long) ((JSONObject) obj).get("failedID");
-                    String response;
+                    String response =" ";
                     if (senderID != failedID) {
-                        if (ns.removeNode(failedID).equals("Node with hash: " + failedID + " was removed\n")) {
+                            ns.removeNode(failedID);
                             NamingServer.ipMapLock.readLock().lock();
                             ns.logger.info(NamingServer.getIpMapping().toString());
                             Integer previousID = NamingServer.getIpMapping().lowerKey(senderID);
@@ -91,16 +91,10 @@ public class Discovery extends Thread {
                                     + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "," + "\"previousIP\":" + "\"" +
                                     previousIP + "\"" + "," + "\"nextIP\":" + "\"" + nextIP + "\"" + "}";
                             NamingServer.ipMapLock.readLock().unlock();
-                        } else {
-                            ns.logger.info("Node we tried to remove does not exist");
-                            response = "{\"status\":\"Node does not exist\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + failedID + "," +
-                                    "\"node amount\":" + NamingServer.getIpMapping().size() + "}";
                         }
                         DatagramPacket responsePacket = new DatagramPacket(response.getBytes(StandardCharsets.UTF_8), response.length(), receivePacket.getAddress(), 8001);
                         this.socket.send(responsePacket);
                     }
-                }
-
                 } catch (IOException | ParseException e) {
                 //e.printStackTrace();
             }
