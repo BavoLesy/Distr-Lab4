@@ -149,7 +149,7 @@ public class DiscoveryNode extends Thread {
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
             this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
-            this.amount = 1; //start amount
+            this.amount = 100; //start amount
         } catch (SocketException e) {
             this.discoverySocket = null;
             this.answerSocket = null;
@@ -158,7 +158,7 @@ public class DiscoveryNode extends Thread {
         }
     }
     @Override
-    public void run() {
+    public void run(){
         List<String> nodesList = new ArrayList<>(); //list that keeps track of which nodes answered already
         List<String> nodesList2 = new ArrayList<>(); //list that keeps track of which nodes we already received discovery
         byte[] receive = new byte[512];
@@ -197,7 +197,6 @@ public class DiscoveryNode extends Thread {
                 //make sure we get answer from ALL nodes so use diff IPS
                 if(!nodesList.contains(receivePacket.getAddress().getHostAddress())) {
                     nodesList.add(receivePacket.getAddress().getHostAddress());
-
                 }
                 if(nodesList.size() >= getAmount()){
                     setDiscoveryPhase(false);
