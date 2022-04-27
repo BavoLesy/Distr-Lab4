@@ -28,6 +28,7 @@ public class NamingNode {
         //start discovery
         this.discoveryNode = new DiscoveryNode(name, this);
         this.discoveryNode.start();
+
     }
     public void getFile(String filename) {
         try {
@@ -97,7 +98,7 @@ public class NamingNode {
         }
         NamingNode node = new NamingNode(name); //start new node --> also starts discovery in Thread
         new PingNode(node).start();
-        Thread.sleep(60000);
+        Thread.sleep(120000);
         new ShutdownNode(node).start(); // start shutdown in different Thread
         //node.newNode(name, IP);
         //node.getNode(name);

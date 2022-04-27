@@ -28,7 +28,7 @@ public class ShutdownNode extends Thread{
         node.delete(currentID);
     }
     @Override
-    public void run(){
+    public void start(){
         try {
             System.out.println("Shutting down...");
             // Send the nextID to the previousNode and send the previousID to the nextNode using datagrampackets
