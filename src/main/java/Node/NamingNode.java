@@ -64,7 +64,6 @@ public class NamingNode {
     public void delete(int hash){
         try {
             String url = "http://" + discoveryNode.getServerIP() + ":8080/NamingServer/Nodes/" + hash;
-            System.out.println(discoveryNode.getServerIP());
             System.out.println(Unirest.delete(url).asString().getBody());
         } catch (Exception e) {
             e.printStackTrace();

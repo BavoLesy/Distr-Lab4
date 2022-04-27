@@ -149,7 +149,7 @@ public class DiscoveryNode extends Thread {
             this.answerSocket.setBroadcast(true);
             this.answerSocket.setSoTimeout(1000);
             this.currentIP = InetAddress.getLocalHost().getHostAddress(); //current IP of the node
-            this.amount = 100; //start amount
+            this.amount = 100; //start amount --> 100 so we don't leave discoveryPhase whilst the server hasnt answer yet
         } catch (SocketException e) {
             this.discoverySocket = null;
             this.answerSocket = null;
@@ -198,7 +198,7 @@ public class DiscoveryNode extends Thread {
                 if(!nodesList.contains(receivePacket.getAddress().getHostAddress())) {
                     nodesList.add(receivePacket.getAddress().getHostAddress());
                 }
-                if(nodesList.size() >= getAmount()){
+                if(nodesList.size() >= getAmount()){ // If we received from all Nodes and the server --> discoveryPhase false
                     setDiscoveryPhase(false);
                 }
             }
@@ -208,7 +208,6 @@ public class DiscoveryNode extends Thread {
         }
         while(getNode().getRunning()) {
             try {
-                //Thread.sleep(900);
                 getAnswerSocket().receive(receivePacket);
                 String s1 = receivePacket.getAddress().toString(); //IP of the sending node
                 String s2 = "/" + InetAddress.getLocalHost().getHostAddress(); //IP of the current node
