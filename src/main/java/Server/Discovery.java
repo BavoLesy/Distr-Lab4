@@ -90,6 +90,7 @@ public class Discovery extends Thread {
                                     "\"node amount\":" + NamingServer.getIpMapping().size() + ","
                                     + "\"previousID\":" + previousID + "," + "\"nextID\":" + nextID + "," + "\"previousIP\":" + "\"" +
                                     previousIP + "\"" + "," + "\"nextIP\":" + "\"" + nextIP + "\"" + "}";
+                            NamingServer.ipMapLock.readLock().unlock();
                         } else {
                             ns.logger.info("Node we tried to remove does not exist");
                             response = "{\"status\":\"Node does not exist\"," + "\"sender\":\"NamingServer\"," + "\"node ID\":" + failedID + "," +

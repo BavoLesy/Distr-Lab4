@@ -25,7 +25,7 @@ public class ShutdownNode extends Thread{
         this.previousIP = node.discoveryNode.getPreviousIP();
         this.shutdownSocket = new DatagramSocket(8002);
         this.shutdownSocket.setSoTimeout(1000);
-        node.delete(ToHash.hash(name));
+        node.delete(currentID);
     }
     @Override
     public void run(){
